@@ -23,16 +23,10 @@ public class UserEntity {
     @JoinColumn(name = "role")
     private RoleEntity role;
 
-    // Relación: Un usuario tiene muchas inscripciones (pendiente por crear )
+    // Relación: Un usuario tiene muchas inscripciones a través de las cuales se
+    // relaciona con los grupos
     @OneToMany(mappedBy = "user")
     private List<InscriptionEntity> inscriptions;
-
-    @ManyToMany
-    private List<GroupEntity> groups; // Los grupos a los que pertenece el usuario, me toco crearlo por que una
-                                      // busqueda en UserRepository me lo pedia
-    // para buscar usuarios por el codigo del grupo, entonces como un usuario puede
-    // pertenecer a muchos grupos y un grupo puede tener muchos usuarios, entonces
-    // es una relacion ManyToMany
 
     // Constructor vacío
     public UserEntity() {
