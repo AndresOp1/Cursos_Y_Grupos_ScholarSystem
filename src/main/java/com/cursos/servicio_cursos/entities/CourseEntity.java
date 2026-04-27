@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "courses") // Tabla para almacenar los cursos
+@Table(name = "courses", schema = "courses_groups") // Tabla para almacenar los cursos
 public class CourseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,8 @@ public class CourseEntity {
     private List<GroupEntity> groups; // Los grupos que pertenecen al curso
 
     // Constructor vacío
-    public CourseEntity() {}
+    public CourseEntity() {
+    }
 
     // Constructor con campos básicos que serian el name y credits
     public CourseEntity(String name, int credits) {
@@ -67,5 +68,5 @@ public class CourseEntity {
     public void setCode(String code) {
         this.code = code;
     }
-    
+
 }

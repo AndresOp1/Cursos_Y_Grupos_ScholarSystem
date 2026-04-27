@@ -7,14 +7,16 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "inscriptions") // Tabla para almacenar las inscripciones de los estudiantes a los cursos
+@Table(name = "inscriptions", schema = "courses_groups") // Tabla para almacenar las inscripciones de los estudiantes a
+                                                         // los cursos
 public class InscriptionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // relacion, muchas inscripciones pertenecen a un usuario entonces seria ManyToOne
+    // relacion, muchas inscripciones pertenecen a un usuario entonces seria
+    // ManyToOne
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user; // El usuario que se inscribe al curso
@@ -24,19 +26,22 @@ public class InscriptionEntity {
     @JoinColumn(name = "group_id")
     private GroupEntity group; // El grupo al que se inscribe el usuario
 
-    
-    // Fecha y hora de la inscripción aunque no lo vi en el diagrama, veamos que dice brayan
+    // Fecha y hora de la inscripción aunque no lo vi en el diagrama, veamos que
+    // dice brayan
     @Column(nullable = false)
-    private LocalDateTime inscriptionDate; // Fecha y hora de la inscripción   
+    private LocalDateTime inscriptionDate; // Fecha y hora de la inscripción
 
     // Constructor vacío
-    public InscriptionEntity() {}
+    public InscriptionEntity() {
+    }
 
-    // Constructor con campos básicos que serian el usuario, grupo y fecha de inscripcion
+    // Constructor con campos básicos que serian el usuario, grupo y fecha de
+    // inscripcion
     public InscriptionEntity(UserEntity user, GroupEntity group) {
         this.user = user;
         this.group = group;
-        this.inscriptionDate = LocalDateTime.now(); // Asignamos la fecha y hora actual al momento de crear la inscripción
+        this.inscriptionDate = LocalDateTime.now(); // Asignamos la fecha y hora actual al momento de crear la
+                                                    // inscripción
 
     }
 
@@ -47,12 +52,12 @@ public class InscriptionEntity {
 
     public void setId(Long id) {
         this.id = id;
-    }           
+    }
 
     public UserEntity getUser() {
         return user;
     }
-    
+
     public void setUser(UserEntity user) {
         this.user = user;
     }

@@ -3,18 +3,15 @@
 //guiandome por el diagrama de brayan esta clase debe tener una relacion con la clase UserEntity y ScheduleEntity, ademas de tener un atributos
 // de (id, code, name. creditos, curso, profesor, horarios, inscripciones) aunque horaros no se sabe.
 
-
 package com.cursos.servicio_cursos.entities;
 
 import jakarta.persistence.*;
 import java.util.List;
 
-
-
 @Entity
-@Table(name = "groups")
+@Table(name = "groups", schema = "courses_groups")
 public class GroupEntity {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,21 +30,24 @@ public class GroupEntity {
     @JoinColumn(name = "course_id")
     private CourseEntity course; // El curso al que pertenece el grupo
 
-    // la relacion es que muchos grupos pertenecen a un profesor entonces seria ManyToOne
+    // la relacion es que muchos grupos pertenecen a un profesor entonces seria
+    // ManyToOne
     @ManyToOne
     @JoinColumn(name = "teacher_id")
-    private UserEntity teacher;     // El profesor que tendra el grupo
+    private UserEntity teacher; // El profesor que tendra el grupo
 
     // la relacion es que un grupo tiene muchos horarios entonces seria OneToMany
     @OneToMany(mappedBy = "group")
     private List<ScheduleEntity> schedules; // Los horarios del grupo
 
-    // la relacion es que un grupo tiene muchas inscripciones entonces seria OneToMany
+    // la relacion es que un grupo tiene muchas inscripciones entonces seria
+    // OneToMany
     @OneToMany(mappedBy = "group")
     private List<InscriptionEntity> inscriptions; // Las inscripciones al grupo
 
     // Constructor vacío
-    public GroupEntity() {}
+    public GroupEntity() {
+    }
 
     // Constructor con campos básicos que serian el code, name, curso
     public GroupEntity(String code, String name, CourseEntity course) {
@@ -60,7 +60,7 @@ public class GroupEntity {
     // Getters y Setters
     public Long getId() {
         return id;
-    }   
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -76,7 +76,7 @@ public class GroupEntity {
 
     public String getName() {
         return name;
-    }   
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -121,7 +121,5 @@ public class GroupEntity {
     public void setInscriptions(List<InscriptionEntity> inscriptions) {
         this.inscriptions = inscriptions;
     }
-
-
 
 }

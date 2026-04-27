@@ -2,24 +2,24 @@
 
 package com.cursos.servicio_cursos.entities;
 
-import com.cursos.servicio_cursos.enums.DayOfWeek; 
+import com.cursos.servicio_cursos.enums.DayOfWeek;
 import java.time.LocalTime;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "schedules") // Tabla para almacenar los horarios de los cursos
+@Table(name = "schedules", schema = "courses_groups") // Tabla para almacenar los horarios de los cursos
 public class ScheduleEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DayOfWeek day; // Día de la semana del horario
 
     @Column(nullable = false)
-    private LocalTime  timeStar; // Hora de inicio del horario
+    private LocalTime timeStar; // Hora de inicio del horario
 
     @Column(nullable = false)
     private LocalTime timeEnd; // Hora de fin del horario
@@ -29,13 +29,17 @@ public class ScheduleEntity {
     @JoinColumn(name = "group_id")
     private GroupEntity group; // El grupo al que pertenece este horario
 
-    //@ManyToMany 
-    //private CourseEntity course; // Los cursos a los que pertenece este horario, me toco crearlo por que una busqueda en ScheduleRepository me lo
-    //  pedia para buscar horarios por el ID del curso, entoces como un curso puede tener muchos horarios es oneToMany, me toco comentarlo para que puediera correr el codigo
-    //toca que mirar como hacer la busqueda por el id del surso.
+    // @ManyToMany
+    // private CourseEntity course; // Los cursos a los que pertenece este horario,
+    // me toco crearlo por que una busqueda en ScheduleRepository me lo
+    // pedia para buscar horarios por el ID del curso, entoces como un curso puede
+    // tener muchos horarios es oneToMany, me toco comentarlo para que puediera
+    // correr el codigo
+    // toca que mirar como hacer la busqueda por el id del surso.
 
     // Constructor vacío
-    public ScheduleEntity() {}
+    public ScheduleEntity() {
+    }
 
     // Constructor con campos básicos que serian el dia, inicio, final y grupo
     public ScheduleEntity(DayOfWeek day, LocalTime timeStar, LocalTime timeEnd, GroupEntity group) {
