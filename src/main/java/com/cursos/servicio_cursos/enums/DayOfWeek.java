@@ -1,0 +1,12 @@
+package com.cursos.servicio_cursos.enums;
+
+//enum para representar los días de la semana, para poder asignar los dias a los cursos
+public enum DayOfWeek {
+    MONDAY,
+    TUESDAY,
+    WEDNESDAY,
+    THURSDAY,
+    FRIDAY,
+    SATURDAY,
+    SUNDAY
+}
