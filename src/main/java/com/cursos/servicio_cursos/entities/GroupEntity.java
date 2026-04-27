@@ -24,6 +24,7 @@ import java.util.List;
 public class GroupEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false, unique = true, name = "group_id")
     private long groupId; // Codigo unico del grupo
 
@@ -42,7 +43,7 @@ public class GroupEntity {
     private UserEntity teacher; // El profesor que tendra el grupo
 
     // la relacion es que un grupo tiene muchos horarios entonces seria OneToMany
-    @OneToMany(mappedBy = "group")
+    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
     private List<ScheduleEntity> schedules; // Los horarios del grupo
 
     // la relacion es que un grupo tiene muchas inscripciones entonces seria
