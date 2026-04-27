@@ -9,6 +9,7 @@ import com.cursos.servicio_cursos.exceptions.InvalidDayOfWeekException;
 import com.cursos.servicio_cursos.exceptions.UserNotFoundException;
 import com.cursos.servicio_cursos.mappers.ScheduleMapper;
 import com.cursos.servicio_cursos.entities.InscriptionEntity;
+import com.cursos.servicio_cursos.entities.InscriptionId;
 import com.cursos.servicio_cursos.repositories.CourseRepository;
 import com.cursos.servicio_cursos.repositories.GroupRepository;
 import com.cursos.servicio_cursos.repositories.ScheduleRepository;
@@ -27,11 +28,11 @@ import java.util.List;
 public class GroupService {
 
     private final ScheduleRepository scheduleRepository;
-    private GroupRepository groupRepository;
-    private UserRepository userRepository;
-    private CourseRepository courseRepo;
-    private InscriptionRepository inscriptionRepository;
-    private ScheduleMapper scheduleMapper;
+    private final GroupRepository groupRepository;
+    private final UserRepository userRepository;
+    private final CourseRepository courseRepo;
+    private final InscriptionRepository inscriptionRepository;
+    private final ScheduleMapper scheduleMapper;
 
     // CREATE: Crear un nuevo grupo
     public GroupEntity createGroup(RequestGroup requestGroup) {
@@ -92,7 +93,8 @@ public class GroupService {
                     .orElseThrow(() -> new RuntimeException("Estudiante no encontrado con id: " + studentId));
 
             // Verificar si ya está inscrito
-            boolean alreadyInscribed = inscriptionRepository.existsByUserIdAndGroupId(studentId, groupId);
+            boolean alreadyInscribed = inscriptionRepository.findByUserIdAndGroupId(studentId, groupId).isPresent();
+
             if (!alreadyInscribed) {
                 InscriptionEntity inscription = InscriptionEntity.builder()
                         .group(group)
