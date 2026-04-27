@@ -37,5 +37,5 @@ CREATE TABLE IF NOT EXISTS courses_groups.schedules (
     day VARCHAR(50) NOT NULL,
     start_time TIME NOT NULL,
     end_time TIME NOT NULL,
-    group_id BIGINT NOT NULL UNIQUE REFERENCES courses_groups.groups (group_id)
+    group_id BIGINT NOT NULL REFERENCES courses_groups.groups (group_id)
 );
