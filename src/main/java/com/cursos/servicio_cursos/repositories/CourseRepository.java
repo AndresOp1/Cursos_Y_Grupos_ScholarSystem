@@ -11,12 +11,15 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
 
     Optional<CourseEntity> findByCode(Long code); // este método me permite buscar un curso por su ID.
 
-    List<CourseEntity> findByName(String name); // este método me permite buscar cursos por su nombre, pero devuelve una
-                                                // lista de cursos que coincidan con ese nombre.
+    Optional<CourseEntity> findByName(String name);
+
+    // este método me permite buscar cursos por su nombre, pero devuelve
+    // lista de cursos que coincidan con ese nombre.
     // preguntarle a abrayan si este metodo es necesario o si con el findByName es
     // suficiente, ya que el findByName devuelve un solo curso y el
     // findByCourseEntities devuelve una
     // lista de cursos, entonces depende de como se quiera manejar la busqueda de
     // cursos por nombre.
+    List<CourseEntity> findByNameContainingIgnoreCase(String name);
 
 }
