@@ -5,9 +5,19 @@ package com.cursos.servicio_cursos.entities;
 import com.cursos.servicio_cursos.enums.DayOfWeek;
 import java.time.LocalTime;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table(name = "schedules", schema = "courses_groups") // Tabla para almacenar los horarios de los cursos
+@Table(name = "schedules", schema = "courses_groups")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder // Tabla para almacenar los horarios de los cursos
 public class ScheduleEntity {
 
     @Id
@@ -36,58 +46,5 @@ public class ScheduleEntity {
     // tener muchos horarios es oneToMany, me toco comentarlo para que puediera
     // correr el codigo
     // toca que mirar como hacer la busqueda por el id del surso.
-
-    // Constructor vacío
-    public ScheduleEntity() {
-    }
-
-    // Constructor con campos básicos que serian el dia, inicio, final y grupo
-    public ScheduleEntity(DayOfWeek day, LocalTime timeStar, LocalTime timeEnd, GroupEntity group) {
-        this.day = day;
-        this.timeStar = timeStar;
-        this.timeEnd = timeEnd;
-        this.group = group;
-    }
-
-    // Getters y Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public DayOfWeek getDay() {
-        return day;
-    }
-
-    public void setDay(DayOfWeek day) {
-        this.day = day;
-    }
-
-    public LocalTime getTimeStar() {
-        return timeStar;
-    }
-
-    public void setTimeStar(LocalTime timeStar) {
-        this.timeStar = timeStar;
-    }
-
-    public LocalTime getTimeEnd() {
-        return timeEnd;
-    }
-
-    public void setTimeEnd(LocalTime timeEnd) {
-        this.timeEnd = timeEnd;
-    }
-
-    public GroupEntity getGroup() {
-        return group;
-    }
-
-    public void setGroup(GroupEntity group) {
-        this.group = group;
-    }
 
 }
