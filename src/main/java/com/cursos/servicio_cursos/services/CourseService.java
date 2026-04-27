@@ -8,40 +8,79 @@ package com.cursos.servicio_cursos.services;
 import com.cursos.servicio_cursos.dtos.RequestCourse;
 import com.cursos.servicio_cursos.dtos.ResponseCourse;
 import com.cursos.servicio_cursos.entities.CourseEntity;
+import com.cursos.servicio_cursos.exceptions.CourseAlreadyExistsException;
 import com.cursos.servicio_cursos.repositories.CourseRepository;
-import org.springframework.beans.factory.annotation.Autowired; // esto es para intectar automaticamente el repositorio, creando el objeto por mi.
+import com.cursos.servicio_cursos.repositories.InscriptionRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
-
+@Slf4j
+@RequiredArgsConstructor
 public class CourseService {
-    
-    @Autowired
-    private CourseRepository courseRepository;
+    private final CourseRepository courseRepository;
+    private final InscriptionRepository inscriptionRepository;
 
-    // crear un nuevo curso 
-    public CourseEntity createCourse(RequestCourse requestCourse){
+    // crear un nuevo curso
+    public CourseEntity createCourse(RequestCourse requestCourse) {
+        log.info("Peticion de guardar curso: {}", requestCourse);
 
-        CourseEntity course = new CourseEntity();
-        course.setCode(requestCourse.getCode());
-        course.setName(requestCourse.getName());
-        course.setCredits(requestCourse.getCredits());
+        if (requestCourse.credits() <= 0) {
+            throw new IllegalArgumentException("El nuevo curso no puede tener creditos negativos");
+        }
 
-        return courseRepository.save(course);
+        // validate if course already exists to send a exception
+        if (courseRepository.findById(requestCourse.code()).isPresent()) {
+            throw new CourseAlreadyExistsException(
+                    String.format("Curso con el codigo %d ya existe", requestCourse.code()));
+        }
+
+        // validate that there is not other course with the same name
+        if (courseRepository.findByName(requestCourse.name()).isPresent()) {
+            throw new CourseAlreadyExistsException(
+                    String.format("Curso con el nombre %s ya existe", requestCourse.name()));
+        }
+
+        CourseEntity course = CourseEntity.builder()
+                .code(requestCourse.code())
+                .credits(requestCourse.credits())
+                .name(requestCourse.name())
+                .build();
+
+        CourseEntity courseSaved = courseRepository.save(course);
+        log.info("Curso guardado: {}", courseSaved);
+        return courseSaved;
     }
 
     // aca listo todos los cursos con el nombre.
-    public List<ResponseCourse> finACourseName(){
-        List<CourseEntity> courses = courseRepository.findAll();
+    public List<ResponseCourse> findAllCourses(String text) {
+        List<CourseEntity> courses;
+        if (text == null) {
+            courses = courseRepository.findAll();
+        } else {
+            courses = courseRepository.findByNameContainingIgnoreCase(text);
+        }
 
-        // aca hago la conversion de la lista de cursos a una lista de responseCourse para que solo me muestre el nombre del curso.
-        return courses.stream().map(course -> new ResponseCourse(course.getId(), course.getName())).collect(Collectors.toList());
-
+        // aca hago la conversion de la lista de cursos a una lista de responseCourse
+        // para que solo me muestre el nombre del curso.
+        return courses.stream().map(this::fromEntityToResponse).toList();
     }
 
+    public List<ResponseCourse> findCoursesByUserId(long userId) {
+        List<CourseEntity> courses = inscriptionRepository.findCoursesByUserId(userId);
+        return courses.stream().map(this::fromEntityToResponse).toList();
+    }
 
-    
+    private ResponseCourse fromEntityToResponse(CourseEntity c) {
+        return ResponseCourse.builder()
+                .name(c.getName())
+                .code(c.getCode())
+                .credits(c.getCredits())
+                .build();
+    }
+
 }
-

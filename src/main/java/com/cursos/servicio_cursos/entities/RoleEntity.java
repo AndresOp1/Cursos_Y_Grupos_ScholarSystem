@@ -6,23 +6,25 @@ package com.cursos.servicio_cursos.entities;
 import jakarta.persistence.*;
 import java.util.List;
 
-
 @Entity
-@Table(name = "roles") // Tabla para almacenar los roles de los usuarios
+@Table(name = "roles", schema = "courses_groups") // Tabla para almacenar los roles de los usuarios
 public class RoleEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  //generamos auromaticamente el id de cada rol autoincrementable
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "role_id") // generamos auromaticamente el id de cada rol autoincrementable
     private Long id;
 
     @Column(nullable = false, unique = true)
     private String name; // Nombre del rol
 
-    // Relación: un rol puede ser asignado a muchos usuarios entonces seria OneToMany
+    // Relación: un rol puede ser asignado a muchos usuarios entonces seria
+    // OneToMany
     @OneToMany(mappedBy = "role")
     private List<UserEntity> users; // Los usuarios que tienen este rol
 
     // Constructor vacío
-    public RoleEntity() {}
+    public RoleEntity() {
+    }
 
     // Constructor con campos básicos que serian el name
     public RoleEntity(String name) {
@@ -45,5 +47,5 @@ public class RoleEntity {
     public void setName(String name) {
         this.name = name;
     }
-    
+
 }
