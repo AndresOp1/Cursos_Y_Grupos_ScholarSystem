@@ -17,31 +17,30 @@ import java.util.stream.Collectors;
 @Service
 
 public class CourseService {
-    
+
     @Autowired
     private CourseRepository courseRepository;
 
-    // crear un nuevo curso 
-    public CourseEntity createCourse(RequestCourse requestCourse){
+    // crear un nuevo curso
+    public CourseEntity createCourse(RequestCourse requestCourse) {
 
-        CourseEntity course = new CourseEntity();
-        course.setCode(requestCourse.getCode());
-        course.setName(requestCourse.getName());
-        course.setCredits(requestCourse.getCredits());
+        CourseEntity course = CourseEntity.builder()
+                .code(requestCourse.code())
+                .credits(requestCourse.credits())
+                .name(requestCourse.name())
+                .build();
 
         return courseRepository.save(course);
     }
 
     // aca listo todos los cursos con el nombre.
-    public List<ResponseCourse> finACourseName(){
+    public List<ResponseCourse> finACourseName() {
         List<CourseEntity> courses = courseRepository.findAll();
 
-        // aca hago la conversion de la lista de cursos a una lista de responseCourse para que solo me muestre el nombre del curso.
-        return courses.stream().map(course -> new ResponseCourse(course.getId(), course.getName())).collect(Collectors.toList());
-
+        // aca hago la conversion de la lista de cursos a una lista de responseCourse
+        // para que solo me muestre el nombre del curso.
+        return courses.stream().map(course -> new ResponseCourse(course.getCode(), course.getName()))
+                .collect(Collectors.toList());
     }
 
-
-    
 }
-
