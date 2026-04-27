@@ -3,27 +3,31 @@
 package com.cursos.servicio_cursos.controllers;
 
 import com.cursos.servicio_cursos.services.GroupService;
+
+import lombok.RequiredArgsConstructor;
+
 import com.cursos.servicio_cursos.entities.GroupEntity;
 import com.cursos.servicio_cursos.dtos.RequestGroup;
 import com.cursos.servicio_cursos.dtos.ResponseGroup;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController // Anotación para indicar que esta clase es un controlador REST para manejar
                 // solicitudes HTTP
 @RequestMapping("/api/groups") // Anotación para definir la ruta base para todas las solicitudes relacionadas
                                // con grupos
-
+@RequiredArgsConstructor
 public class GroupController {
 
-    @Autowired
-    private GroupService groupService;
+    private final GroupService groupService;
 
     // POST para crear un nuevo grupo
     @PostMapping
@@ -35,6 +39,11 @@ public class GroupController {
         ResponseGroup newGroup = groupService.createGroup(requestGroup);
         return new ResponseEntity<>(newGroup, HttpStatus.CREATED); // Devuelve el grupo creado con el estado HTTP 201
                                                                    // (CREATED)
+    }
+
+    @GetMapping("/{courseCode}")
+    public ResponseEntity<List<ResponseGroup>> findGoupsByCourseId(@PathVariable Long courseCode) {
+        return ResponseEntity.ok(groupService.findGroupsByCourseCode(courseCode));
     }
 
     @PutMapping("{groupId}/teacher/{teacherId}") // Anotación para manejar solicitudes HTTP PUT para asignar un profesor

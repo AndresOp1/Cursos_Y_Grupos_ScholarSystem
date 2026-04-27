@@ -9,6 +9,7 @@ import com.cursos.servicio_cursos.entities.UserEntity;
 import com.cursos.servicio_cursos.exceptions.CourseNotFoundException;
 import com.cursos.servicio_cursos.exceptions.InvalidDayOfWeekException;
 import com.cursos.servicio_cursos.exceptions.UserNotFoundException;
+import com.cursos.servicio_cursos.mappers.GroupMapper;
 import com.cursos.servicio_cursos.mappers.ScheduleMapper;
 import com.cursos.servicio_cursos.entities.InscriptionEntity;
 import com.cursos.servicio_cursos.repositories.CourseRepository;
@@ -28,6 +29,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GroupService {
 
+    private final GroupMapper groupMapper;
     private final ScheduleRepository scheduleRepository;
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
@@ -70,6 +72,11 @@ public class GroupService {
             scheduleRepository.saveAll(schedules);
         }
 
+        return extracted(savedGroup);
+
+    }
+
+    private ResponseGroup extracted(GroupEntity savedGroup) {
         return ResponseGroup.builder()
                 .schedules(savedGroup.getSchedules().stream().map(scheduleMapper::toDto).toList())
                 .groupName(savedGroup.getName())
@@ -79,7 +86,6 @@ public class GroupService {
                         .name(savedGroup.getCourse().getName())
                         .credits(savedGroup.getCourse().getCredits()).build())
                 .build();
-
     }
 
     // UPDATE: Asignar profesor a un grupo
@@ -120,5 +126,10 @@ public class GroupService {
                 inscriptionRepository.save(inscription);
             }
         }
+    }
+
+    public List<ResponseGroup> findGroupsByCourseCode(Long courseCode) {
+        return groupRepository.findGroupsByCourseCode(courseCode).stream().map(groupMapper::fromEntityToResopnse)
+                .toList();
     }
 }

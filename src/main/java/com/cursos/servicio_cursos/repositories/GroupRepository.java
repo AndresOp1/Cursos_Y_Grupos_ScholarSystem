@@ -13,6 +13,9 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Long> {
     @Query("SELECT g FROM GroupEntity g WHERE g.teacher.id = :teacherId")
     List<GroupEntity> findByTeacherId(@Param("teacherId") Long teacherId); // este método me permite buscar grupos por
                                                                            // el ID del profesor.
+
+    @Query("SELECT g FROM GroupEntity g WHERE g.course.code = :courseCode")
+    List<GroupEntity> findGroupsByCourseCode(@Param("courseCode") Long courseCode);
 }
 
 // no se si este repositorio sea necesario
