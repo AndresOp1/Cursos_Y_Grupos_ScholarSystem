@@ -10,9 +10,6 @@ import java.util.List;
 @Table(name = "courses", schema = "courses_groups") // Tabla para almacenar los cursos
 public class CourseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(nullable = false, unique = true)
     private String code; // Código único del curso
 
