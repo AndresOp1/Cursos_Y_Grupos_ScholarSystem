@@ -1,6 +1,8 @@
 package com.cursos.servicio_cursos.services;
 
 import com.cursos.servicio_cursos.dtos.RequestGroup;
+import com.cursos.servicio_cursos.dtos.ResponseCourse;
+import com.cursos.servicio_cursos.dtos.ResponseGroup;
 import com.cursos.servicio_cursos.entities.CourseEntity;
 import com.cursos.servicio_cursos.entities.GroupEntity;
 import com.cursos.servicio_cursos.entities.UserEntity;
@@ -9,7 +11,6 @@ import com.cursos.servicio_cursos.exceptions.InvalidDayOfWeekException;
 import com.cursos.servicio_cursos.exceptions.UserNotFoundException;
 import com.cursos.servicio_cursos.mappers.ScheduleMapper;
 import com.cursos.servicio_cursos.entities.InscriptionEntity;
-import com.cursos.servicio_cursos.entities.InscriptionId;
 import com.cursos.servicio_cursos.repositories.CourseRepository;
 import com.cursos.servicio_cursos.repositories.GroupRepository;
 import com.cursos.servicio_cursos.repositories.ScheduleRepository;
@@ -35,13 +36,16 @@ public class GroupService {
     private final ScheduleMapper scheduleMapper;
 
     // CREATE: Crear un nuevo grupo
-    public GroupEntity createGroup(RequestGroup requestGroup) {
+    public ResponseGroup createGroup(RequestGroup requestGroup) {
 
         CourseEntity course = courseRepo.findByCode(requestGroup.getCourseId())
                 .orElseThrow(CourseNotFoundException::new);
 
-        UserEntity teacher = userRepository.findById(requestGroup.getTeacherId())
-                .orElseThrow(UserNotFoundException::new);
+        UserEntity teacher = null;
+        if (requestGroup.getTeacherId() != null) {
+            teacher = userRepository.findById(requestGroup.getTeacherId())
+                    .orElseThrow(UserNotFoundException::new);
+        }
 
         List<ScheduleEntity> schedules = null;
         try {
@@ -51,18 +55,31 @@ public class GroupService {
             throw new InvalidDayOfWeekException();
         }
 
-        if (schedules != null) {
-            scheduleRepository.saveAll(schedules);
-        }
-
         GroupEntity group = GroupEntity.builder()
                 .name(requestGroup.getName())
                 .course(course)
-                .teacher(teacher)
                 .schedules(schedules == null ? List.of() : schedules)
                 .build();
+        if (teacher != null) {
+            group.setTeacher(teacher);
+        }
+        GroupEntity savedGroup = groupRepository.save(group);
 
-        return groupRepository.save(group);
+        if (schedules != null) {
+            schedules.stream().forEach(s -> s.setGroup(savedGroup));
+            scheduleRepository.saveAll(schedules);
+        }
+
+        return ResponseGroup.builder()
+                .schedules(savedGroup.getSchedules().stream().map(scheduleMapper::toDto).toList())
+                .groupName(savedGroup.getName())
+                .teacherId(savedGroup.getTeacher() == null ? null : savedGroup.getTeacher().getId())
+                .course(ResponseCourse.builder()
+                        .code(savedGroup.getCourse().getCode())
+                        .name(savedGroup.getCourse().getName())
+                        .credits(savedGroup.getCourse().getCredits()).build())
+                .build();
+
     }
 
     // UPDATE: Asignar profesor a un grupo
