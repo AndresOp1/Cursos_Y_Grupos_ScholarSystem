@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController // Anotación para indicar que esta clase es un controlador REST para manejar
                 // solicitudes HTTP
@@ -42,6 +44,11 @@ public class CourseController {
     public ResponseEntity<List<ResponseCourse>> getAllCourses(@RequestParam(required = false) String text) {
         List<ResponseCourse> courses = courseService.findAllCourses(text);
         return ResponseEntity.ok(courses); // Devuelve la lista de cursos con el estado HTTP 200 (OK)
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<ResponseCourse>> getCoursesByUser(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(courseService.findCoursesByUserId(userId));
     }
 
 }

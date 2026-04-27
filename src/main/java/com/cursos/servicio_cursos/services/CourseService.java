@@ -10,6 +10,7 @@ import com.cursos.servicio_cursos.dtos.ResponseCourse;
 import com.cursos.servicio_cursos.entities.CourseEntity;
 import com.cursos.servicio_cursos.exceptions.CourseAlreadyExistsException;
 import com.cursos.servicio_cursos.repositories.CourseRepository;
+import com.cursos.servicio_cursos.repositories.InscriptionRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CourseService {
     private final CourseRepository courseRepository;
+    private final InscriptionRepository inscriptionRepository;
 
     // crear un nuevo curso
     public CourseEntity createCourse(RequestCourse requestCourse) {
@@ -65,6 +67,11 @@ public class CourseService {
 
         // aca hago la conversion de la lista de cursos a una lista de responseCourse
         // para que solo me muestre el nombre del curso.
+        return courses.stream().map(this::fromEntityToResponse).toList();
+    }
+
+    public List<ResponseCourse> findCoursesByUserId(long userId) {
+        List<CourseEntity> courses = inscriptionRepository.findCoursesByUserId(userId);
         return courses.stream().map(this::fromEntityToResponse).toList();
     }
 
