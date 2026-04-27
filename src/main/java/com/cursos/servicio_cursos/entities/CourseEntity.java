@@ -4,14 +4,24 @@
 package com.cursos.servicio_cursos.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
 @Entity
 @Table(name = "courses", schema = "courses_groups") // Tabla para almacenar los cursos
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CourseEntity {
     @Id
-    @Column(nullable = false, unique = true)
-    private String code; // Código único del curso
+    private Long code; // Código único del curso
 
     @Column(nullable = false, unique = true)
     private String name; // Nombre del curso
@@ -22,48 +32,4 @@ public class CourseEntity {
     // Relación: un curso tiene muchos grupos entonces seria OneToMany
     @OneToMany(mappedBy = "course")
     private List<GroupEntity> groups; // Los grupos que pertenecen al curso
-
-    // Constructor vacío
-    public CourseEntity() {
-    }
-
-    // Constructor con campos básicos que serian el name y credits
-    public CourseEntity(String name, int credits) {
-        this.name = name;
-        this.credits = credits;
-    }
-
-    // Getters y Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getCredits() {
-        return credits;
-    }
-
-    public void setCredits(int credits) {
-        this.credits = credits;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
 }
