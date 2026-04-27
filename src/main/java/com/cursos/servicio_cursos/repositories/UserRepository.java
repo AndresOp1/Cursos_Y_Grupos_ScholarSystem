@@ -7,13 +7,13 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
-    
+
     UserEntity findByEmail(String email); // este método me permite buscar un usuario por su correo electrónico.
 
-    List<UserEntity> findByRole_Name(String roleName); // este método me permite buscar usuarios por el nombre de su rol.
-
-    List<UserEntity> findByGroups_Code(String groupCode); // este método me permite buscar usuarios por el código de su grupo.
+    List<UserEntity> findByRole_Name(String roleName); // este método me permite buscar usuarios por el nombre de su
+                                                       // rol.
 
     List<UserEntity> findByFullName(String fullName); // este método me permite buscar usuarios por su nombre completo.
 }
-// tengo que hablar con brayan sobre estas busquedas ya que en el servicio de usurios deben estar. 
+// tengo que hablar con brayan sobre estas busquedas ya que en el servicio de
+// usurios deben estar.
