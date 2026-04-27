@@ -22,16 +22,19 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class InscriptionEntity {
 
+    @EmbeddedId
+    private InscriptionId id;
+
     // relacion, muchas inscripciones pertenecen a un usuario entonces seria
     // ManyToOne
     @ManyToOne
-    @Id
+    @MapsId("userId")
     @JoinColumn(name = "student_id")
     private UserEntity user; // El usuario que se inscribe al curso
 
     // relacion, muchas inscripciones pertenecen a un grupo entonces seria ManyToOne
     @ManyToOne
-    @Id
+    @MapsId("groupId")
     @JoinColumn(name = "group_id")
     private GroupEntity group; // El grupo al que se inscribe el usuario
 
