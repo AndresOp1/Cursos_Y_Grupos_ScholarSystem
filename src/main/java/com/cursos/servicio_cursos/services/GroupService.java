@@ -21,7 +21,6 @@ import com.cursos.servicio_cursos.repositories.InscriptionRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,7 +45,7 @@ public class GroupService {
         List<ScheduleEntity> schedules = null;
         try {
             schedules = requestGroup.getSchedules().stream().map(scheduleMapper::toEntity)
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (IllegalArgumentException e) {
             throw new InvalidDayOfWeekException();
         }
@@ -95,7 +94,10 @@ public class GroupService {
             // Verificar si ya está inscrito
             boolean alreadyInscribed = inscriptionRepository.existsByUserIdAndGroupId(studentId, groupId);
             if (!alreadyInscribed) {
-                InscriptionEntity inscription = new InscriptionEntity(student, group);
+                InscriptionEntity inscription = InscriptionEntity.builder()
+                        .group(group)
+                        .user(student)
+                        .build();
                 inscriptionRepository.save(inscription);
             }
         }
