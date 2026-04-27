@@ -4,6 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record ResponseCourse(
-        Long code,
-        String name) {
+                Long code,
+                String name,
+                int credits) {
 }
