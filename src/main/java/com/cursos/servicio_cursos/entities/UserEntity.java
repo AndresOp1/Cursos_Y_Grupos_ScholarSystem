@@ -1,10 +1,21 @@
 package com.cursos.servicio_cursos.entities;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.List;
 
 @Entity
 @Table(name = "users", schema = "courses_groups")
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
+@Builder
 public class UserEntity {
 
     @Id
@@ -28,55 +39,4 @@ public class UserEntity {
     @OneToMany(mappedBy = "user")
     private List<InscriptionEntity> inscriptions;
 
-    // Constructor vacío
-    public UserEntity() {
-    }
-
-    // Constructor con campos básicos
-    public UserEntity(String fullName, String email, RoleEntity role) {
-        this.fullName = fullName;
-        this.email = email;
-        this.role = role;
-    }
-
-    // Getters y Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public RoleEntity getRole() {
-        return role;
-    }
-
-    public void setRole(RoleEntity role) {
-        this.role = role;
-    }
-
-    public List<InscriptionEntity> getInscriptions() {
-        return inscriptions;
-    }
-
-    public void setInscriptions(List<InscriptionEntity> inscriptions) {
-        this.inscriptions = inscriptions;
-    }
 }
