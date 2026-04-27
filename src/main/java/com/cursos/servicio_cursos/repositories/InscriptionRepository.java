@@ -1,18 +1,29 @@
 package com.cursos.servicio_cursos.repositories;
 
 import com.cursos.servicio_cursos.entities.InscriptionEntity;
+import com.cursos.servicio_cursos.entities.InscriptionId;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-public interface InscriptionRepository extends JpaRepository<InscriptionEntity, Long> {
-    
-    List<InscriptionEntity> findByUserId(long userId); // este método me permite buscar inscripciones por el ID del usuario al que pertenecen.
+public interface InscriptionRepository extends JpaRepository<InscriptionEntity, InscriptionId> {
 
-    List<InscriptionEntity> findByGroupId(long groupId); // este método me permite buscar inscripciones por el ID del grupo al que pertenecen.
+    @Query("SELECT i FROM InscriptionEntity i WHERE i.user.id = :userId")
+    List<InscriptionEntity> findByUserId(@Param("userId") long userId); // este método me permite buscar inscripciones
+                                                                        // por el ID del usuario al que pertenecen.
 
-    boolean existsByUserIdAndGroupId(long userId, long groupId); // este método me permite verificar si existe una inscripción para un usuario y un grupo
+    @Query("SELECT i FROM InscriptionEntity i WHERE i.group.groupId = :groupId")
+    List<InscriptionEntity> findByGroupId(@Param("groupId") long groupId); // este método me permite buscar
+                                                                           // inscripciones por el ID del
+    // grupo al que pertenecen.
+
+    // este método me permite verificar si existe una
+    // inscripción para un usuario y un grupo
+    @Query("SELECT i FROM InscriptionEntity i WHERE i.user.id = :userId AND i.group.groupId = :groupId")
+    Optional<InscriptionEntity> findByUserIdAndGroupId(@Param("userId") Long userId, @Param("groupId") Long groupId);
 }
-
-
