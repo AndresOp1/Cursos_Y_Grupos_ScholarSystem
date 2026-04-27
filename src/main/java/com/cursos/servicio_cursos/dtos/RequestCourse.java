@@ -10,7 +10,7 @@ import lombok.Builder;
 
 @Builder
 public record RequestCourse(
-        long code,
-        String name,
-        int credits) {
+                long code,
+                String name,
+                int credits) {
 }
