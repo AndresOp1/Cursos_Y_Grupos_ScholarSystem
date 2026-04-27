@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS courses_groups.courses (
 
 CREATE TABLE IF NOT EXISTS courses_groups.groups (
     group_id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(200) NOT NULL,
     teacher_id BIGINT REFERENCES courses_groups.users (user_id),
     course_code BIGINT REFERENCES courses_groups.courses (code)
 );
