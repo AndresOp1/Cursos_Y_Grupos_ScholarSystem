@@ -16,8 +16,7 @@ import java.util.List;
 public class RequestGroup {
     private String groupId;
     private String name;
-    private int credits;
     private Long courseId;
     private Long teacherId;
-    private List<ScheduleRequest> schedules;
+    private List<ScheduleDto> schedules;
 }
