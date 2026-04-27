@@ -28,6 +28,6 @@ public interface InscriptionRepository extends JpaRepository<InscriptionEntity, 
     @Query("SELECT i FROM InscriptionEntity i WHERE i.user.id = :userId AND i.group.groupId = :groupId")
     Optional<InscriptionEntity> findByUserIdAndGroupId(@Param("userId") Long userId, @Param("groupId") Long groupId);
 
-    @Query("SELECT DISTINCT i.group.course FROM INSCRIPTION i WHERE i.user.id = :userId")
+    @Query("SELECT DISTINCT i.group.course FROM InscriptionEntity i WHERE i.user.id = :userId")
     List<CourseEntity> findCoursesByUserId(@Param("userId") Long userId);
 }
