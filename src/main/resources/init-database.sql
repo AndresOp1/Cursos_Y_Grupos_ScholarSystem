@@ -25,12 +25,12 @@ CREATE TABLE IF NOT EXISTS courses_groups.groups (
     course_code BIGINT REFERENCES courses_groups.courses (code)
 );
 
-CREATE TABLE courses_groups.inscriptions (
+CREATE TABLE IF NOT EXISTS courses_groups.inscriptions (
     group_id BIGINT REFERENCES courses_groups.groups (group_id),
     student_id BIGINT REFERENCES courses_groups.users (user_id),
     inscription_date TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY (group_id, student_id)
-)
+);
 
 CREATE TABLE IF NOT EXISTS courses_groups.schedules (
     schedule_id BIGSERIAL PRIMARY KEY,
