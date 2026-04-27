@@ -10,7 +10,8 @@ import java.util.List;
 @Table(name = "roles", schema = "courses_groups") // Tabla para almacenar los roles de los usuarios
 public class RoleEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // generamos auromaticamente el id de cada rol autoincrementable
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "role_id") // generamos auromaticamente el id de cada rol autoincrementable
     private Long id;
 
     @Column(nullable = false, unique = true)

@@ -9,6 +9,7 @@ public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
     @Column(nullable = false)
@@ -19,7 +20,7 @@ public class UserEntity {
 
     // Relación: Muchos usuarios tienen UN rol
     @ManyToOne
-    @JoinColumn(name = "role_id")
+    @JoinColumn(name = "role")
     private RoleEntity role;
 
     // Relación: Un usuario tiene muchas inscripciones (pendiente por crear )

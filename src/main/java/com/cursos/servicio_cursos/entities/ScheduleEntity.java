@@ -22,16 +22,17 @@ public class ScheduleEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "schedule_id")
     private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DayOfWeek day; // Día de la semana del horario
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "start_time")
     private LocalTime timeStar; // Hora de inicio del horario
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "end_time")
     private LocalTime timeEnd; // Hora de fin del horario
 
     // Relación: muchos horarios pertenecen a un grupo

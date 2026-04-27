@@ -32,7 +32,7 @@ public class GroupEntity {
 
     // la recion es que muchos grupos pertenecen a un curos entonces seria ManyToOne
     @ManyToOne
-    @JoinColumn(name = "course_id")
+    @JoinColumn(name = "course_code")
     private CourseEntity course; // El curso al que pertenece el grupo
 
     // la relacion es que muchos grupos pertenecen a un profesor entonces seria
