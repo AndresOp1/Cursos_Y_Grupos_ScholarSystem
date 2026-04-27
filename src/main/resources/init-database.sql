@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS courses_groups.groups (
 CREATE TABLE courses_groups.inscriptions (
     group_id BIGINT REFERENCES courses_groups.groups (group_id),
     student_id BIGINT REFERENCES courses_groups.users (user_id),
+    inscription_date TIMESTAMP NOT NULL DEFAULT NOW(),
     PRIMARY KEY (group_id, student_id)
 )
 
