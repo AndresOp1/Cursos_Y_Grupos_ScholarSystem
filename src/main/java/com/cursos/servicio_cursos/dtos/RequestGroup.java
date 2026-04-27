@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class RequestGroup {
-    private String code;
+    private String groupId;
     private String name;
     private int credits;
     private Long courseId;
