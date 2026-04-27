@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import com.cursos.servicio_cursos.entities.CourseEntity;
 import com.cursos.servicio_cursos.dtos.RequestCourse;
 import com.cursos.servicio_cursos.dtos.ResponseCourse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -40,8 +39,8 @@ public class CourseController {
     }
 
     @GetMapping // Anotación para manejar solicitudes HTTP GET para obtener la lista de cursos
-    public ResponseEntity<List<ResponseCourse>> getAllCourses() {
-        List<ResponseCourse> courses = courseService.finACourseName();
+    public ResponseEntity<List<ResponseCourse>> getAllCourses(@RequestParam(required = false) String text) {
+        List<ResponseCourse> courses = courseService.findAllCourses(text);
         return ResponseEntity.ok(courses); // Devuelve la lista de cursos con el estado HTTP 200 (OK)
     }
 
