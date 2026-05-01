@@ -45,6 +45,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.azure.spring</groupId>
             <artifactId>spring-cloud-azure-starter-storage-queue</artifactId>
         </dependency>
