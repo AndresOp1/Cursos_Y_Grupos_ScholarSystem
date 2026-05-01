@@ -23,5 +23,4 @@ public class ValidateTokenService implements ValidateTokenPort {
         .onErrorReturn(false)
         .block();
   }
-
 }
