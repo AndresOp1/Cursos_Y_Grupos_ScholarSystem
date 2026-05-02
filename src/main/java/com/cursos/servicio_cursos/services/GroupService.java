@@ -6,7 +6,9 @@ import com.cursos.servicio_cursos.dtos.ResponseGroup;
 import com.cursos.servicio_cursos.entities.CourseEntity;
 import com.cursos.servicio_cursos.entities.GroupEntity;
 import com.cursos.servicio_cursos.entities.UserEntity;
+import com.cursos.servicio_cursos.exceptions.AsingTeacherException;
 import com.cursos.servicio_cursos.exceptions.CourseNotFoundException;
+import com.cursos.servicio_cursos.exceptions.GroupNotFoundException;
 import com.cursos.servicio_cursos.exceptions.InvalidDayOfWeekException;
 import com.cursos.servicio_cursos.exceptions.InvalidTeacherException;
 import com.cursos.servicio_cursos.exceptions.UserNotFoundException;
@@ -17,9 +19,13 @@ import com.cursos.servicio_cursos.repositories.CourseRepository;
 import com.cursos.servicio_cursos.repositories.GroupRepository;
 import com.cursos.servicio_cursos.repositories.ScheduleRepository;
 import com.cursos.servicio_cursos.repositories.UserRepository;
+
+import jakarta.transaction.Transactional;
+
 import com.cursos.servicio_cursos.entities.ScheduleEntity;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import com.cursos.servicio_cursos.repositories.InscriptionRepository;
 import org.springframework.lang.NonNull;
@@ -28,6 +34,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class GroupService {
 
     private final GroupMapper groupMapper;
@@ -81,7 +88,7 @@ public class GroupService {
         return ResponseGroup.builder()
                 .schedules(savedGroup.getSchedules().stream().map(scheduleMapper::toDto).toList())
                 .groupName(savedGroup.getName())
-                .teacherId(savedGroup.getTeacher() == null ? null : savedGroup.getTeacher().getId())
+                .teacher(savedGroup.getTeacher())
                 .course(ResponseCourse.builder()
                         .code(savedGroup.getCourse().getCode())
                         .name(savedGroup.getCourse().getName())
@@ -90,23 +97,27 @@ public class GroupService {
     }
 
     // UPDATE: Asignar profesor a un grupo
-    public GroupEntity assignTeacher(Long idTeacher, Long groupId) {
+    @Transactional
+    public ResponseGroup assignTeacher(Long idTeacher, Long groupId) {
+        log.info("Modificando grupo {}...", groupId);
         // Buscar el grupo
-        GroupEntity group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new RuntimeException("Grupo no encontrado con id: " + groupId));
+        groupRepository.findById(groupId)
+                .orElseThrow(() -> new GroupNotFoundException(groupId));
 
         // Buscar el profesor (usuario)
         UserEntity teacher = userRepository.findById(idTeacher)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + idTeacher));
+                .orElseThrow(InvalidTeacherException::new);
 
         if (!"PROFESOR".equals(teacher.getRole().getName())) {
             throw new InvalidTeacherException();
         }
-
-        // Asignar el profesor al grupo
-        group.setTeacher(teacher);
-
-        return groupRepository.save(group);
+        int rowCounts = groupRepository.asingTeacher(teacher, groupId);
+        log.info("filas afectadas: {}", rowCounts);
+        if (rowCounts == 1) {
+            GroupEntity groupEntity = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
+            return groupMapper.fromEntityToResopnse(groupEntity);
+        }
+        throw new AsingTeacherException();
     }
 
     // CREATE: Asignar estudiantes a un grupo (crear inscripciones)
