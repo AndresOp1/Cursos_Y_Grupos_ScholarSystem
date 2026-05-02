@@ -8,6 +8,7 @@ import com.cursos.servicio_cursos.entities.GroupEntity;
 import com.cursos.servicio_cursos.entities.UserEntity;
 import com.cursos.servicio_cursos.exceptions.CourseNotFoundException;
 import com.cursos.servicio_cursos.exceptions.InvalidDayOfWeekException;
+import com.cursos.servicio_cursos.exceptions.InvalidTeacherException;
 import com.cursos.servicio_cursos.exceptions.UserNotFoundException;
 import com.cursos.servicio_cursos.mappers.GroupMapper;
 import com.cursos.servicio_cursos.mappers.ScheduleMapper;
@@ -97,6 +98,10 @@ public class GroupService {
         // Buscar el profesor (usuario)
         UserEntity teacher = userRepository.findById(idTeacher)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado con id: " + idTeacher));
+
+        if (!"PROFESOR".equals(teacher.getRole().getName())) {
+            throw new InvalidTeacherException();
+        }
 
         // Asignar el profesor al grupo
         group.setTeacher(teacher);
