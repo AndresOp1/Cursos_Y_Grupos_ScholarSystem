@@ -2,12 +2,15 @@ package com.cursos.servicio_cursos.dtos;
 
 import java.util.List;
 
+import com.cursos.servicio_cursos.entities.UserEntity;
+
 import lombok.Builder;
 
 @Builder
 public record ResponseGroup(
-    String groupName,
-    Long teacherId,
-    List<ScheduleDto> schedules,
-    ResponseCourse course) {
+        Long id,
+        String groupName,
+        UserEntity teacher,
+        List<ScheduleDto> schedules,
+        ResponseCourse course) {
 }
