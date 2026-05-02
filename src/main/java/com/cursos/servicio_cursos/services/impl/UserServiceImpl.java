@@ -23,14 +23,12 @@ public class UserServiceImpl implements UserService {
     RoleEntity role = roleRepo.findByName(userMessage.role())
         .orElseThrow(() -> new InvalidRoleException(userMessage.role()));
 
-    UserEntity userEntity = UserEntity.builder()
-        .id(userMessage.id())
-        .email(userMessage.email())
-        .fullName(userMessage.fullName())
-        .role(role)
-        .build();
+    UserEntity userEntity = userRepo.findById(userMessage.id())
+        .orElse(UserEntity.builder().id(userMessage.id()).build());
 
+    userEntity.setEmail(userMessage.email());
+    userEntity.setFullName(userMessage.fullName());
+    userEntity.setRole(role);
     userRepo.save(userEntity);
   }
-
 }
