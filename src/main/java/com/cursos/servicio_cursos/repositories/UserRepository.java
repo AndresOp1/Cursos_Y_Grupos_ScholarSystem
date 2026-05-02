@@ -4,11 +4,13 @@ import com.cursos.servicio_cursos.entities.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
-    UserEntity findByEmail(String email); // este método me permite buscar un usuario por su correo electrónico.
+    Optional<UserEntity> findByEmail(String email); // este método me permite buscar un usuario por su correo
+                                                    // electrónico.
 
     List<UserEntity> findByRole_Name(String roleName); // este método me permite buscar usuarios por el nombre de su
                                                        // rol.
