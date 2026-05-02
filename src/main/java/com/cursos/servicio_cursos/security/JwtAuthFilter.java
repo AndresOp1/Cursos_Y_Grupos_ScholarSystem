@@ -21,9 +21,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
   private final JwtService jwtService;
   private final ValidateTokenPort validateTokenPort;
@@ -33,30 +35,36 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
+
+    log.info("llamda al endpoint: {} con metodo {}", request.getRequestURI(), request.getMethod());
     if (request.getMethod().equals("OPTIONS")) {
       filterChain.doFilter(request, response);
       return;
     }
     final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-    if (authHeader == null || !authHeader.startsWith("Berarer ")) {
+    log.info("cabecera de autenticacion: {}", authHeader);
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
       filterChain.doFilter(request, response);
       return;
     }
 
     final String token = authHeader.substring(7);
     final String userEmail = jwtService.getEmail(token);
+    log.info("llamada del usuario: {}", userEmail);
     if (userEmail == null || SecurityContextHolder.getContext().getAuthentication() != null) {
       filterChain.doFilter(request, response);
       return;
     }
 
     boolean isTokenValid = validateTokenPort.validateToken(token);
+    log.info("usuario de email {} con tonken {}", userEmail, isTokenValid);
     if (!isTokenValid) {
       filterChain.doFilter(request, response);
     }
 
     final UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
     final Optional<UserEntity> user = userRepository.findByEmail(userDetails.getUsername());
+    log.info("Usuario cargado: {}", userDetails);
     if (user.isEmpty()) {
       filterChain.doFilter(request, response);
       return;
@@ -67,6 +75,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     SecurityContextHolder.getContext().setAuthentication(auth);
     filterChain.doFilter(request, response);
+    log.info("usuario autenticado correctamente");
 
   }
 
