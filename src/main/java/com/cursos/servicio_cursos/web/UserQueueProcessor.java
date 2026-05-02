@@ -9,8 +9,6 @@ import com.azure.storage.queue.QueueClient;
 import com.azure.storage.queue.models.QueueMessageItem;
 import com.cursos.servicio_cursos.dtos.UserMessage;
 import com.cursos.servicio_cursos.services.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
