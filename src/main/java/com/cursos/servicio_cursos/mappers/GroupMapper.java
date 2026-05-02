@@ -17,8 +17,9 @@ public class GroupMapper {
 
   public ResponseGroup fromEntityToResopnse(GroupEntity entity) {
     return ResponseGroup.builder()
+        .id(entity.getGroupId())
         .groupName(entity.getName())
-        .teacherId(entity.getTeacher() == null ? null : entity.getTeacher().getId())
+        .teacher(entity.getTeacher())
         .schedules(entity.getSchedules() == null ? List.of()
             : entity.getSchedules().stream().map(scheduleMapper::toDto).toList())
         .course(courseMapper.fromEntityToCourseResponse(entity.getCourse()))
