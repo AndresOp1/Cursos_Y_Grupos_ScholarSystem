@@ -5,16 +5,20 @@
 
 package com.cursos.servicio_cursos.services;
 
+import com.cursos.servicio_cursos.dtos.PageResponse;
 import com.cursos.servicio_cursos.dtos.RequestCourse;
 import com.cursos.servicio_cursos.dtos.ResponseCourse;
 import com.cursos.servicio_cursos.entities.CourseEntity;
 import com.cursos.servicio_cursos.exceptions.CourseAlreadyExistsException;
+import com.cursos.servicio_cursos.exceptions.CourseNotFoundException;
 import com.cursos.servicio_cursos.repositories.CourseRepository;
 import com.cursos.servicio_cursos.repositories.InscriptionRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -57,22 +61,33 @@ public class CourseService {
     }
 
     // aca listo todos los cursos con el nombre.
-    public List<ResponseCourse> findAllCourses(String text) {
-        List<CourseEntity> courses;
-        if (text == null) {
-            courses = courseRepository.findAll();
-        } else {
-            courses = courseRepository.findByNameContainingIgnoreCase(text);
-        }
-
-        // aca hago la conversion de la lista de cursos a una lista de responseCourse
-        // para que solo me muestre el nombre del curso.
-        return courses.stream().map(this::fromEntityToResponse).toList();
+    public PageResponse<ResponseCourse> findAllCourses(String text, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        org.springframework.data.domain.Page<ResponseCourse> response = courseRepository.filterCourses(text, pageable);
+        return PageResponse.<ResponseCourse>builder()
+                .content(response.getContent())
+                .currentPage(response.getNumber())
+                .totalPages(response.getTotalPages())
+                .pageSize(response.getSize())
+                .totalElements(response.getTotalElements())
+                .isLast(response.isLast())
+                .isFirst(response.isFirst())
+                .build();
     }
 
     public List<ResponseCourse> findCoursesByUserId(long userId) {
         List<CourseEntity> courses = inscriptionRepository.findCoursesByUserId(userId);
         return courses.stream().map(this::fromEntityToResponse).toList();
+    }
+
+    public ResponseCourse findCourseByCode(long code) {
+        CourseEntity course = courseRepository.findByCode(code)
+                .orElseThrow(CourseNotFoundException::new);
+        return ResponseCourse.builder()
+                .code(course.getCode())
+                .name(course.getName())
+                .credits(course.getCredits())
+                .build();
     }
 
     private ResponseCourse fromEntityToResponse(CourseEntity c) {

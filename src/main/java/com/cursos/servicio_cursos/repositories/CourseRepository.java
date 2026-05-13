@@ -1,7 +1,13 @@
 package com.cursos.servicio_cursos.repositories;
 
+import com.cursos.servicio_cursos.dtos.ResponseCourse;
 import com.cursos.servicio_cursos.entities.CourseEntity;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
@@ -21,5 +27,23 @@ public interface CourseRepository extends JpaRepository<CourseEntity, Long> {
     // lista de cursos, entonces depende de como se quiera manejar la busqueda de
     // cursos por nombre.
     List<CourseEntity> findByNameContainingIgnoreCase(String name);
+
+    @Query(value = """
+                SELECT new com.cursos.servicio_cursos.dtos.ResponseCourse(
+                    c.code,
+                    c.name,
+                    c.credits,
+                    COUNT(g)
+                )
+                FROM CourseEntity c
+                LEFT JOIN c.groups g
+                WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%'))
+                GROUP BY c.code, c.name, c.credits
+            """, countQuery = """
+            SELECT COUNT(c)
+            FROM CourseEntity c
+            WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :name, '%'))
+            """)
+    Page<ResponseCourse> filterCourses(@Param("name") String name, Pageable pagelble);
 
 }
