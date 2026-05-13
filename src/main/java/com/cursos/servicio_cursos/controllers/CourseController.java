@@ -39,7 +39,7 @@ public class CourseController {
     @GetMapping
     public ResponseEntity<PageResponse<ResponseCourse>> getAllCourses(@RequestParam(required = false) String text,
             @RequestParam(required = false, defaultValue = "0") int page,
-            @RequestParam(required = false, defaultValue = "8") int size) {
+            @RequestParam(required = false, defaultValue = "6") int size) {
         return ResponseEntity.ok(courseService.findAllCourses(text, page, size));
     }
 
