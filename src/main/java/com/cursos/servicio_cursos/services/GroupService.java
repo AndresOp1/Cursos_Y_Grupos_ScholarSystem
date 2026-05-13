@@ -50,7 +50,12 @@ public class GroupService {
     private final ScheduleMapper scheduleMapper;
 
     // CREATE: Crear un nuevo grupo
+    @Transactional
     public ResponseGroup createGroup(RequestGroup requestGroup) {
+
+        if (requestGroup.getCapacity() < 10) {
+            throw new IllegalArgumentException("La capacidad minima de un grupo es de 10 estudiantes");
+        }
 
         CourseEntity course = courseRepo.findByCode(requestGroup.getCourseId())
                 .orElseThrow(CourseNotFoundException::new);
@@ -74,10 +79,12 @@ public class GroupService {
                 .name(requestGroup.getName())
                 .course(course)
                 .schedules(schedules == null ? List.of() : schedules)
+                .capacity(requestGroup.getCapacity())
                 .build();
         if (teacher != null) {
             group.setTeacher(teacher);
         }
+        log.info("apunto de guardar grupo {}", group);
         GroupEntity savedGroup = groupRepository.save(group);
 
         if (schedules != null) {

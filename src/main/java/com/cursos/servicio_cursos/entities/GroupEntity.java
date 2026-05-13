@@ -14,6 +14,8 @@ import lombok.Setter;
 
 import java.util.List;
 
+import org.hibernate.annotations.Check;
+
 @Entity
 @Table(name = "groups", schema = "courses_groups")
 @Getter
@@ -50,5 +52,9 @@ public class GroupEntity {
     // OneToMany
     @OneToMany(mappedBy = "group")
     private List<InscriptionEntity> inscriptions; // Las inscripciones al grupo
+
+    @Check(constraints = "capacity >= 10")
+    @Column(nullable = true, name = "capacity", columnDefinition = "INT DEFAULT 10")
+    private int capacity; // La capacidad del grupo
 
 }
