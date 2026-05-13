@@ -1,13 +1,16 @@
 package com.cursos.servicio_cursos.services.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.cursos.servicio_cursos.dtos.UserMessage;
+import com.cursos.servicio_cursos.dtos.UserResponse;
 import com.cursos.servicio_cursos.entities.RoleEntity;
 import com.cursos.servicio_cursos.entities.UserEntity;
 import com.cursos.servicio_cursos.exceptions.InvalidRoleException;
+import com.cursos.servicio_cursos.mappers.UserMapper;
 import com.cursos.servicio_cursos.repositories.RoleRepository;
 import com.cursos.servicio_cursos.repositories.UserRepository;
 import com.cursos.servicio_cursos.services.UserService;
@@ -20,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
+  private final UserMapper userMapper;
   private final UserRepository userRepo;
   private final RoleRepository roleRepo;
 
@@ -44,5 +48,10 @@ public class UserServiceImpl implements UserService {
         .build();
     userRepo.save(user);
 
+  }
+
+  @Override
+  public List<UserResponse> fetchTeachers() {
+    return userRepo.findTeachers().stream().map(userMapper::fomEntityToResponse).toList();
   }
 }

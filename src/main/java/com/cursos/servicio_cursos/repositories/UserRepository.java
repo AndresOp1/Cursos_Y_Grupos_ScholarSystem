@@ -24,6 +24,9 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     List<UserEntity> findByFullName(String fullName); // este método me permite buscar usuarios por su nombre completo.
 
+    @Query("SELECT u FROM UserEntity u WHERE u.role.name = 'PROFESOR'")
+    List<UserEntity> findTeachers();
+
     @Modifying
     @Transactional
     @Query("UPDATE UserEntity u SET u.fullName = :fullName, u.email = :email, u.role = :role WHERE id = :userId")
