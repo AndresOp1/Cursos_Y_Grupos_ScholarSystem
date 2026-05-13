@@ -146,6 +146,7 @@ public class GroupService {
                     .build();
             inscriptionRepository.save(newInscription);
         }
+        log.info("Se inscribieron los estudiantes: {} al grupo {}", studentsInscriptions.studentsEmails(), group);
     }
 
     public List<ResponseGroup> findGroupsByCourseCode(Long courseCode) {
