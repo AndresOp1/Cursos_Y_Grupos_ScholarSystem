@@ -7,6 +7,7 @@ import com.cursos.servicio_cursos.services.GroupService;
 import lombok.RequiredArgsConstructor;
 
 import com.cursos.servicio_cursos.dtos.RequestGroup;
+import com.cursos.servicio_cursos.dtos.RequestStudentsInscriptions;
 import com.cursos.servicio_cursos.dtos.ResponseGroup;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class GroupController {
         return new ResponseEntity<>(newGroup, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{courseCode}")
+    @GetMapping("course/{courseCode}")
     public ResponseEntity<List<ResponseGroup>> findGoupsByCourseId(@PathVariable Long courseCode) {
         return ResponseEntity.ok(groupService.findGroupsByCourseCode(courseCode));
     }
@@ -40,5 +41,11 @@ public class GroupController {
     @PutMapping("{groupId}/teacher/{teacherId}")
     public ResponseEntity<ResponseGroup> assignTeacher(@PathVariable Long groupId, @PathVariable Long teacherId) {
         return ResponseEntity.ok(groupService.assignTeacher(teacherId, groupId));
+    }
+
+    @PostMapping("/inscriptions")
+    public ResponseEntity<Void> inscribeStudents(@RequestBody RequestStudentsInscriptions requestBody) {
+        groupService.assignStudents(requestBody);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 }
