@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import com.cursos.servicio_cursos.entities.CourseEntity;
+import com.cursos.servicio_cursos.dtos.PageResponse;
 import com.cursos.servicio_cursos.dtos.RequestCourse;
 import com.cursos.servicio_cursos.dtos.ResponseCourse;
 import org.springframework.http.ResponseEntity;
@@ -23,28 +24,26 @@ public class CourseController {
 
     private final CourseService courseService;
 
-    @PostMapping // Anotación para manejar solicitudes HTTP POST para crear un nuevo curso
-    public ResponseEntity<CourseEntity> createCourse(@RequestBody RequestCourse requestCourse) { // toma la peticion
-                                                                                                 // http y lo convierte
-                                                                                                 // en un objeto de tipo
-                                                                                                 // RequestCourse, que
-                                                                                                 // es un DTO que
-                                                                                                 // contiene los datos
-                                                                                                 // necesarios para
-                                                                                                 // crear un curso
+    @PostMapping
+    public ResponseEntity<CourseEntity> createCourse(@RequestBody RequestCourse requestCourse) {
         log.info("CONTROLLER: request: {}", requestCourse);
         CourseEntity newCourse = courseService.createCourse(requestCourse);
-        return new ResponseEntity<>(newCourse, HttpStatus.CREATED); // Devuelve el curso creado con el estado HTTP 201
-                                                                    // (CREATED) aun no entiendo bien lo de los estados.
+        return new ResponseEntity<>(newCourse, HttpStatus.CREATED);
     }
 
-    @GetMapping // Anotación para manejar solicitudes HTTP GET para obtener la lista de cursos
-    public ResponseEntity<List<ResponseCourse>> getAllCourses(@RequestParam(required = false) String text) {
-        List<ResponseCourse> courses = courseService.findAllCourses(text);
-        return ResponseEntity.ok(courses); // Devuelve la lista de cursos con el estado HTTP 200 (OK)
+    @GetMapping("/{code}")
+    public ResponseEntity<ResponseCourse> getCourseByCode(@PathVariable("code") Long code) {
+        return ResponseEntity.ok(courseService.findCourseByCode(code));
     }
 
-    @GetMapping("/{userId}")
+    @GetMapping
+    public ResponseEntity<PageResponse<ResponseCourse>> getAllCourses(@RequestParam(required = false) String text,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "8") int size) {
+        return ResponseEntity.ok(courseService.findAllCourses(text, page, size));
+    }
+
+    @GetMapping("/user/{userId}")
     public ResponseEntity<List<ResponseCourse>> getCoursesByUser(@PathVariable("userId") Long userId) {
         return ResponseEntity.ok(courseService.findCoursesByUserId(userId));
     }
