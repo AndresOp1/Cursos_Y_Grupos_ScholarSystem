@@ -1,6 +1,7 @@
 package com.cursos.servicio_cursos.services;
 
 import com.cursos.servicio_cursos.dtos.RequestGroup;
+import com.cursos.servicio_cursos.dtos.RequestStudentsInscriptions;
 import com.cursos.servicio_cursos.dtos.ResponseCourse;
 import com.cursos.servicio_cursos.dtos.ResponseGroup;
 import com.cursos.servicio_cursos.entities.CourseEntity;
@@ -15,6 +16,7 @@ import com.cursos.servicio_cursos.exceptions.UserNotFoundException;
 import com.cursos.servicio_cursos.mappers.GroupMapper;
 import com.cursos.servicio_cursos.mappers.ScheduleMapper;
 import com.cursos.servicio_cursos.entities.InscriptionEntity;
+import com.cursos.servicio_cursos.entities.InscriptionId;
 import com.cursos.servicio_cursos.repositories.CourseRepository;
 import com.cursos.servicio_cursos.repositories.GroupRepository;
 import com.cursos.servicio_cursos.repositories.ScheduleRepository;
@@ -30,7 +32,10 @@ import lombok.extern.slf4j.Slf4j;
 import com.cursos.servicio_cursos.repositories.InscriptionRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +63,7 @@ public class GroupService {
         }
 
         List<ScheduleEntity> schedules = null;
+        log.info("reqwuest schedules: {}", requestGroup.getSchedules());
         try {
             schedules = requestGroup.getSchedules().stream().map(scheduleMapper::toEntity)
                     .toList();
@@ -77,6 +83,7 @@ public class GroupService {
 
         if (schedules != null) {
             schedules.stream().forEach(s -> s.setGroup(savedGroup));
+            log.info("schedules entities: {}", schedules);
             scheduleRepository.saveAll(schedules);
         }
 
@@ -121,26 +128,24 @@ public class GroupService {
     }
 
     // CREATE: Asignar estudiantes a un grupo (crear inscripciones)
-    public void assignStudents(List<Long> studentsId, @NonNull Long groupId) {
-        // Buscar el grupo
-        GroupEntity group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new RuntimeException("Grupo no encontrado con id: " + groupId));
+    @Transactional
+    public void assignStudents(RequestStudentsInscriptions studentsInscriptions) {
+        GroupEntity group = groupRepository.findById(studentsInscriptions.groupId())
+                .orElseThrow(GroupNotFoundException::new);
 
-        // Para cada estudiante, crear una inscripción
-        for (Long studentId : studentsId) {
-            UserEntity student = userRepository.findById(studentId)
-                    .orElseThrow(() -> new RuntimeException("Estudiante no encontrado con id: " + studentId));
+        List<UserEntity> students = studentsInscriptions.studentsEmails().stream()
+                .map(email -> userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email)))
+                .collect(Collectors.toList());
 
-            // Verificar si ya está inscrito
-            boolean alreadyInscribed = inscriptionRepository.findByUserIdAndGroupId(studentId, groupId).isPresent();
-
-            if (!alreadyInscribed) {
-                InscriptionEntity inscription = InscriptionEntity.builder()
-                        .group(group)
-                        .user(student)
-                        .build();
-                inscriptionRepository.save(inscription);
-            }
+        for (UserEntity student : students) {
+            InscriptionId inscriptionId = new InscriptionId(student.getId(), group.getGroupId());
+            InscriptionEntity newInscription = InscriptionEntity.builder()
+                    .id(inscriptionId)
+                    .group(group)
+                    .user(student)
+                    .inscriptionDate(LocalDateTime.now())
+                    .build();
+            inscriptionRepository.save(newInscription);
         }
     }
 
