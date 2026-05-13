@@ -18,5 +18,6 @@ public class RequestGroup {
     private String name;
     private Long courseId;
     private Long teacherId;
+    private int capacity;
     private List<ScheduleDto> schedules;
 }
