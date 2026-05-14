@@ -1,16 +1,14 @@
 package com.cursos.servicio_cursos.dtos;
 
-import java.util.List;
 import lombok.Builder;
+
+import java.util.List;
 
 @Builder
 public record UpdateGroupRequest(
-        Long id,
         String groupName,
         int capacity,
         Long teacherId,
         List<ScheduleDto> schedules,
-        Long courseId,
         List<Long> studentsIds) {
-
 }
