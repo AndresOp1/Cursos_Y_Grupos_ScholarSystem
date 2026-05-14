@@ -33,7 +33,8 @@ public class CourseController {
 
     @GetMapping("/{code}")
     public ResponseEntity<ResponseCourse> getCourseByCode(@PathVariable("code") Long code) {
-        return ResponseEntity.ok(courseService.findCourseByCode(code));
+        return ResponseEntity.ok(
+                courseService.findCourseByCode(code));
     }
 
     @GetMapping
