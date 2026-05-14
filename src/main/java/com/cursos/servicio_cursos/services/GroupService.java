@@ -1,5 +1,6 @@
 package com.cursos.servicio_cursos.services;
 
+import com.cursos.servicio_cursos.dtos.GroupDetails;
 import com.cursos.servicio_cursos.dtos.RequestGroup;
 import com.cursos.servicio_cursos.dtos.RequestStudentsInscriptions;
 import com.cursos.servicio_cursos.dtos.ResponseCourse;
@@ -15,6 +16,7 @@ import com.cursos.servicio_cursos.exceptions.InvalidTeacherException;
 import com.cursos.servicio_cursos.exceptions.UserNotFoundException;
 import com.cursos.servicio_cursos.mappers.GroupMapper;
 import com.cursos.servicio_cursos.mappers.ScheduleMapper;
+import com.cursos.servicio_cursos.mappers.UserMapper;
 import com.cursos.servicio_cursos.entities.InscriptionEntity;
 import com.cursos.servicio_cursos.entities.InscriptionId;
 import com.cursos.servicio_cursos.repositories.CourseRepository;
@@ -48,6 +50,7 @@ public class GroupService {
     private final CourseRepository courseRepo;
     private final InscriptionRepository inscriptionRepository;
     private final ScheduleMapper scheduleMapper;
+    private final UserMapper userMapper;
 
     // CREATE: Crear un nuevo grupo
     @Transactional
@@ -154,6 +157,23 @@ public class GroupService {
             inscriptionRepository.save(newInscription);
         }
         log.info("Se inscribieron los estudiantes: {} al grupo {}", studentsInscriptions.studentsEmails(), group);
+    }
+
+    public GroupDetails getGroupDetails(Long groupId) {
+        GroupEntity group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
+        return GroupDetails.builder()
+                .id(group.getGroupId())
+                .groupName(group.getName())
+                .capacity(group.getCapacity())
+                .teacher(userMapper.fromEntityToResponse(group.getTeacher()))
+                .schedules(group.getSchedules().stream().map(scheduleMapper::toDto).toList())
+                .course(ResponseCourse.builder()
+                        .code(group.getCourse().getCode())
+                        .name(group.getCourse().getName())
+                        .credits(group.getCourse().getCredits()).build())
+                .students(group.getInscriptions().stream().map(i -> userMapper.fromEntityToResponse(i.getUser()))
+                        .toList())
+                .build();
     }
 
     public List<ResponseGroup> findGroupsByCourseCode(Long courseCode) {

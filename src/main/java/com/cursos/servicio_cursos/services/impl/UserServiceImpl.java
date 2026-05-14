@@ -52,6 +52,6 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public List<UserResponse> fetchTeachers() {
-    return userRepo.findTeachers().stream().map(userMapper::fomEntityToResponse).toList();
+    return userRepo.findTeachers().stream().map(userMapper::fromEntityToResponse).toList();
   }
 }

@@ -5,7 +5,9 @@ package com.cursos.servicio_cursos.controllers;
 import com.cursos.servicio_cursos.services.GroupService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+import com.cursos.servicio_cursos.dtos.GroupDetails;
 import com.cursos.servicio_cursos.dtos.RequestGroup;
 import com.cursos.servicio_cursos.dtos.RequestStudentsInscriptions;
 import com.cursos.servicio_cursos.dtos.ResponseGroup;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RestController
 @RequestMapping("/api/groups")
 @RequiredArgsConstructor
+@Slf4j
 public class GroupController {
 
     private final GroupService groupService;
@@ -36,6 +39,13 @@ public class GroupController {
     @GetMapping("course/{courseCode}")
     public ResponseEntity<List<ResponseGroup>> findGoupsByCourseId(@PathVariable Long courseCode) {
         return ResponseEntity.ok(groupService.findGroupsByCourseCode(courseCode));
+    }
+
+    @GetMapping("/{groupId}")
+    public ResponseEntity<GroupDetails> getGroupDetails(@PathVariable Long groupId) {
+        log.info("Peticion de detalles del grupo con id: {}", groupId);
+        GroupDetails groupDetails = groupService.getGroupDetails(groupId);
+        return ResponseEntity.ok(groupDetails);
     }
 
     @PutMapping("{groupId}/teacher/{teacherId}")
