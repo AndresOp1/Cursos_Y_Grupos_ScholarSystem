@@ -9,8 +9,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "inscriptions", schema = "courses_groups") // Tabla para almacenar las inscripciones de los estudiantes a
-// los cursos
+@Table(name = "inscriptions", schema = "courses_groups")
 @Builder
 @Getter
 @Setter
@@ -29,10 +28,10 @@ public class InscriptionEntity {
   @ManyToOne
   @MapsId("groupId")
   @JoinColumn(name = "group_id", nullable = false)
-  private GroupEntity group; // El grupo al que se inscribe el usuario
+  private GroupEntity group;
 
 
   @Column(nullable = false, name = "inscription_date")
-  private LocalDateTime inscriptionDate; // Fecha y hora de la inscripción
+  private LocalDateTime inscriptionDate;
 
 }
