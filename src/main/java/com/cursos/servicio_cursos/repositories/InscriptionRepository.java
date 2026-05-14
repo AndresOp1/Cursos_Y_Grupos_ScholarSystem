@@ -4,30 +4,41 @@ import com.cursos.servicio_cursos.entities.CourseEntity;
 import com.cursos.servicio_cursos.entities.InscriptionEntity;
 import com.cursos.servicio_cursos.entities.InscriptionId;
 
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface InscriptionRepository extends JpaRepository<InscriptionEntity, InscriptionId> {
 
-    @Query("SELECT i FROM InscriptionEntity i WHERE i.user.id = :userId")
-    List<InscriptionEntity> findByUserId(@Param("userId") long userId); // este método me permite buscar inscripciones
-                                                                        // por el ID del usuario al que pertenecen.
+  @Query("SELECT i FROM InscriptionEntity i WHERE i.user.id = :userId")
+  List<InscriptionEntity> findByUserId(@Param("userId") long userId); // este método me permite buscar inscripciones
+  // por el ID del usuario al que pertenecen.
 
-    @Query("SELECT i FROM InscriptionEntity i WHERE i.group.groupId = :groupId")
-    List<InscriptionEntity> findByGroupId(@Param("groupId") long groupId); // este método me permite buscar
-                                                                           // inscripciones por el ID del
-    // grupo al que pertenecen.
+  @Query("SELECT i FROM InscriptionEntity i WHERE i.group.groupId = :groupId")
+  List<InscriptionEntity> findByGroupId(@Param("groupId") long groupId); // este método me permite buscar
+  // inscripciones por el ID del
+  // grupo al que pertenecen.
 
-    // este método me permite verificar si existe una
-    // inscripción para un usuario y un grupo
-    @Query("SELECT i FROM InscriptionEntity i WHERE i.user.id = :userId AND i.group.groupId = :groupId")
-    Optional<InscriptionEntity> findByUserIdAndGroupId(@Param("userId") Long userId, @Param("groupId") Long groupId);
+  // este método me permite verificar si existe una
+  // inscripción para un usuario y un grupo
+  @Query("SELECT i FROM InscriptionEntity i WHERE i.user.id = :userId AND i.group.groupId = :groupId")
+  Optional<InscriptionEntity> findByUserIdAndGroupId(@Param("userId") Long userId, @Param("groupId") Long groupId);
 
-    @Query("SELECT DISTINCT i.group.course FROM InscriptionEntity i WHERE i.user.id = :userId")
-    List<CourseEntity> findCoursesByUserId(@Param("userId") Long userId);
+  @Query("SELECT DISTINCT i.group.course FROM InscriptionEntity i WHERE i.user.id = :userId")
+  List<CourseEntity> findCoursesByUserId(@Param("userId") Long userId);
+
+  @Modifying
+  @Transactional
+  @Query("""
+          DELETE FROM InscriptionEntity i
+          WHERE i.group.groupId = :groupId
+          """)
+  void deleteByGroupId(@Param("groupId") Long groupId);
 }
