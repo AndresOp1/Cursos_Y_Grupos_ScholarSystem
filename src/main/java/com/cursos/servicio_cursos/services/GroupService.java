@@ -151,29 +151,6 @@ public class GroupService {
     throw new AsingTeacherException();
   }
 
-  // CREATE: Asignar estudiantes a un grupo (crear inscripciones)
-  @Transactional
-  public void assignStudents(RequestStudentsInscriptions studentsInscriptions) {
-    GroupEntity group = groupRepository.findById(studentsInscriptions.groupId())
-            .orElseThrow(GroupNotFoundException::new);
-
-    List<UserEntity> students = studentsInscriptions.studentsEmails().stream()
-            .map(email -> userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email)))
-            .toList();
-
-    for (UserEntity student : students) {
-      InscriptionId inscriptionId = new InscriptionId(student.getId(), group.getGroupId());
-      InscriptionEntity newInscription = InscriptionEntity.builder()
-              .id(inscriptionId)
-              .group(group)
-              .user(student)
-              .inscriptionDate(LocalDateTime.now())
-              .build();
-      inscriptionRepo.save(newInscription);
-    }
-    log.info("Se inscribieron los estudiantes: {} al grupo {}", studentsInscriptions.studentsEmails(), group);
-  }
-
   public GroupDetails getGroupDetails(Long groupId) {
     GroupEntity group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
     return GroupDetails.builder()
