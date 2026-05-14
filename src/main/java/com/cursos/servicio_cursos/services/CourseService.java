@@ -26,76 +26,76 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class CourseService {
-    private final CourseRepository courseRepository;
-    private final InscriptionRepository inscriptionRepository;
+  private final CourseRepository courseRepository;
+  private final InscriptionRepository inscriptionRepository;
 
-    // crear un nuevo curso
-    public CourseEntity createCourse(RequestCourse requestCourse) {
-        log.info("Peticion de guardar curso: {}", requestCourse);
+  // crear un nuevo curso
+  public CourseEntity createCourse(RequestCourse requestCourse) {
+    log.info("Peticion de guardar curso: {}", requestCourse);
 
-        if (requestCourse.credits() <= 0) {
-            throw new IllegalArgumentException("El nuevo curso no puede tener creditos negativos");
-        }
-
-        // validate if course already exists to send a exception
-        if (courseRepository.findById(requestCourse.code()).isPresent()) {
-            throw new CourseAlreadyExistsException(
-                    String.format("Curso con el codigo %d ya existe", requestCourse.code()));
-        }
-
-        // validate that there is not other course with the same name
-        if (courseRepository.findByName(requestCourse.name()).isPresent()) {
-            throw new CourseAlreadyExistsException(
-                    String.format("Curso con el nombre %s ya existe", requestCourse.name()));
-        }
-
-        CourseEntity course = CourseEntity.builder()
-                .code(requestCourse.code())
-                .credits(requestCourse.credits())
-                .name(requestCourse.name())
-                .build();
-
-        CourseEntity courseSaved = courseRepository.save(course);
-        log.info("Curso guardado: {}", courseSaved);
-        return courseSaved;
+    if (requestCourse.credits() <= 0) {
+      throw new IllegalArgumentException("El nuevo curso no puede tener creditos negativos");
     }
 
-    // aca listo todos los cursos con el nombre.
-    public PageResponse<ResponseCourse> findAllCourses(String text, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        org.springframework.data.domain.Page<ResponseCourse> response = courseRepository.filterCourses(text, pageable);
-        return PageResponse.<ResponseCourse>builder()
-                .content(response.getContent())
-                .currentPage(response.getNumber())
-                .totalPages(response.getTotalPages())
-                .pageSize(response.getSize())
-                .totalElements(response.getTotalElements())
-                .isLast(response.isLast())
-                .isFirst(response.isFirst())
-                .build();
+    // validate if course already exists to send a exception
+    if (courseRepository.findById(requestCourse.code()).isPresent()) {
+      throw new CourseAlreadyExistsException(
+              String.format("Curso con el codigo %d ya existe", requestCourse.code()));
     }
 
-    public List<ResponseCourse> findCoursesByUserId(long userId) {
-        List<CourseEntity> courses = inscriptionRepository.findCoursesByUserId(userId);
-        return courses.stream().map(this::fromEntityToResponse).toList();
+    // validate that there is not other course with the same name
+    if (courseRepository.findByName(requestCourse.name()).isPresent()) {
+      throw new CourseAlreadyExistsException(
+              String.format("Curso con el nombre %s ya existe", requestCourse.name()));
     }
 
-    public ResponseCourse findCourseByCode(long code) {
-        CourseEntity course = courseRepository.findByCode(code)
-                .orElseThrow(CourseNotFoundException::new);
-        return ResponseCourse.builder()
-                .code(course.getCode())
-                .name(course.getName())
-                .credits(course.getCredits())
-                .build();
-    }
+    CourseEntity course = CourseEntity.builder()
+            .code(requestCourse.code())
+            .credits(requestCourse.credits())
+            .name(requestCourse.name())
+            .build();
 
-    private ResponseCourse fromEntityToResponse(CourseEntity c) {
-        return ResponseCourse.builder()
-                .name(c.getName())
-                .code(c.getCode())
-                .credits(c.getCredits())
-                .build();
-    }
+    CourseEntity courseSaved = courseRepository.save(course);
+    log.info("Curso guardado: {}", courseSaved);
+    return courseSaved;
+  }
+
+  // aca listo todos los cursos con el nombre.
+  public PageResponse<ResponseCourse> findAllCourses(String text, int page, int size) {
+    Pageable pageable = PageRequest.of(page, size);
+    org.springframework.data.domain.Page<ResponseCourse> response = courseRepository.filterCourses(text, pageable);
+    return PageResponse.<ResponseCourse>builder()
+            .content(response.getContent())
+            .currentPage(response.getNumber())
+            .totalPages(response.getTotalPages())
+            .pageSize(response.getSize())
+            .totalElements(response.getTotalElements())
+            .isLast(response.isLast())
+            .isFirst(response.isFirst())
+            .build();
+  }
+
+  public List<ResponseCourse> findCoursesByUserId(long userId) {
+    List<CourseEntity> courses = inscriptionRepository.findCoursesByUserId(userId);
+    return courses.stream().map(this::fromEntityToResponse).toList();
+  }
+
+  public ResponseCourse findCourseByCode(long code) {
+    CourseEntity course = courseRepository.findByCode(code)
+            .orElseThrow(CourseNotFoundException::new);
+    return ResponseCourse.builder()
+            .code(course.getCode())
+            .name(course.getName())
+            .credits(course.getCredits())
+            .build();
+  }
+
+  private ResponseCourse fromEntityToResponse(CourseEntity c) {
+    return ResponseCourse.builder()
+            .name(c.getName())
+            .code(c.getCode())
+            .credits(c.getCredits())
+            .build();
+  }
 
 }
