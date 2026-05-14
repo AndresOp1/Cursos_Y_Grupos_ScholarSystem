@@ -16,8 +16,6 @@ import java.util.List;
 @Repository
 public interface GroupRepository extends JpaRepository<GroupEntity, Long> {
 
-  @Query("SELECT g FROM GroupEntity g WHERE g.teacher.id = :teacherId")
-  List<GroupEntity> findByTeacherId(@Param("teacherId") Long teacherId); // este método me permite buscar grupos por
   // el ID del profesor.
 
   @Query("SELECT g FROM GroupEntity g WHERE g.course.code = :courseCode")
@@ -38,7 +36,7 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Long> {
             g.teacher = :teacher
           WHERE g.groupId = :groupId
           """)
-  int updateGroup(
+  void updateGroup(
           @Param("groupId") Long id,
           @Param("name") String name,
           @Param("teacher") UserEntity teacher,

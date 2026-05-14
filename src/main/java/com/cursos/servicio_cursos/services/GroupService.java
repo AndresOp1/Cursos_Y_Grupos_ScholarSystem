@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +46,7 @@ public class GroupService {
               .orElseThrow(UserNotFoundException::new);
     }
 
-    List<ScheduleEntity> schedules = null;
+    List<ScheduleEntity> schedules;
     log.info("reqwuest schedules: {}", requestGroup.getSchedules());
     try {
       schedules = requestGroup.getSchedules().stream().map(scheduleMapper::toEntity)
@@ -59,7 +58,7 @@ public class GroupService {
     GroupEntity group = GroupEntity.builder()
             .name(requestGroup.getName())
             .course(course)
-            .schedules(schedules == null ? List.of() : schedules)
+            .schedules(schedules)
             .capacity(requestGroup.getCapacity())
             .build();
     if (teacher != null) {
@@ -68,11 +67,10 @@ public class GroupService {
     log.info("apunto de guardar grupo {}", group);
     GroupEntity savedGroup = groupRepository.save(group);
 
-    if (schedules != null) {
-      schedules.stream().forEach(s -> s.setGroup(savedGroup));
-      log.info("schedules entities: {}", schedules);
-      scheduleRepo.saveAll(schedules);
-    }
+    schedules.forEach(s -> s.setGroup(savedGroup));
+    log.info("schedules entities: {}", schedules);
+    scheduleRepo.saveAll(schedules);
+
 
     return extracted(savedGroup);
 
@@ -161,7 +159,7 @@ public class GroupService {
 
     List<UserEntity> students = studentsInscriptions.studentsEmails().stream()
             .map(email -> userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email)))
-            .collect(Collectors.toList());
+            .toList();
 
     for (UserEntity student : students) {
       InscriptionId inscriptionId = new InscriptionId(student.getId(), group.getGroupId());
