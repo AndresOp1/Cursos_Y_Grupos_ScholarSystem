@@ -4,17 +4,13 @@
 package com.cursos.servicio_cursos.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "inscriptions", schema = "courses_groups") // Tabla para almacenar las inscripciones de los estudiantes a
-                                                         // los cursos
+// los cursos
 @Builder
 @Getter
 @Setter
@@ -22,25 +18,25 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class InscriptionEntity {
 
-    @EmbeddedId
-    private InscriptionId id;
+  @EmbeddedId
+  private InscriptionId id;
 
-    // relacion, muchas inscripciones pertenecen a un usuario entonces seria
-    // ManyToOne
-    @ManyToOne
-    @MapsId("userId")
-    @JoinColumn(name = "student_id")
-    private UserEntity user; // El usuario que se inscribe al curso
+  // relacion, muchas inscripciones pertenecen a un usuario entonces seria
+  // ManyToOne
+  @ManyToOne
+  @MapsId("userId")
+  @JoinColumn(name = "student_id", nullable = false)
+  private UserEntity user; // El usuario que se inscribe al curso
 
-    // relacion, muchas inscripciones pertenecen a un grupo entonces seria ManyToOne
-    @ManyToOne
-    @MapsId("groupId")
-    @JoinColumn(name = "group_id")
-    private GroupEntity group; // El grupo al que se inscribe el usuario
+  // relacion, muchas inscripciones pertenecen a un grupo entonces seria ManyToOne
+  @ManyToOne
+  @MapsId("groupId")
+  @JoinColumn(name = "group_id", nullable = false)
+  private GroupEntity group; // El grupo al que se inscribe el usuario
 
-    // Fecha y hora de la inscripción aunque no lo vi en el diagrama, veamos que
-    // dice brayan
-    @Column(nullable = false, name = "inscription_date")
-    private LocalDateTime inscriptionDate; // Fecha y hora de la inscripción
+  // Fecha y hora de la inscripción aunque no lo vi en el diagrama, veamos que
+  // dice brayan
+  @Column(nullable = false, name = "inscription_date")
+  private LocalDateTime inscriptionDate; // Fecha y hora de la inscripción
 
 }
