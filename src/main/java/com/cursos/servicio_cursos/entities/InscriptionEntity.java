@@ -1,6 +1,3 @@
-//  aca vamos a representar las incriciones de los estudiantes a los cursos, para poder asignar los estudiantes a los cursos y llevar un control de las inscripciones
-// segun el diagrama de nrayan esta endidad debe conectar un usuario y un grupo osea UserEntity y GroupEntity
-
 package com.cursos.servicio_cursos.entities;
 
 import jakarta.persistence.*;
