@@ -119,29 +119,6 @@ public class GroupService {
             .build();
   }
 
-  // UPDATE: Asignar profesor a un grupo
-  @Transactional
-  public ResponseGroup assignTeacher(Long idTeacher, Long groupId) {
-    log.info("Modificando grupo {}...", groupId);
-    // Buscar el grupo
-    groupRepository.findById(groupId)
-            .orElseThrow(() -> new GroupNotFoundException(groupId));
-
-    // Buscar el profesor (usuario)
-    UserEntity teacher = userRepository.findById(idTeacher)
-            .orElseThrow(InvalidTeacherException::new);
-
-    if (!"PROFESOR".equals(teacher.getRole().getName())) {
-      throw new InvalidTeacherException();
-    }
-    int rowCounts = groupRepository.asingTeacher(teacher, groupId);
-    log.info("filas afectadas: {}", rowCounts);
-    if (rowCounts == 1) {
-      GroupEntity groupEntity = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
-      return groupMapper.fromEntityToResopnse(groupEntity);
-    }
-    throw new AsingTeacherException();
-  }
 
   public GroupDetails getGroupDetails(Long groupId) {
     GroupEntity group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);

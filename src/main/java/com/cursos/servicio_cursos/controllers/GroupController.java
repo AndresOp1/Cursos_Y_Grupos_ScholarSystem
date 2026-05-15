@@ -1,5 +1,3 @@
-//en este controllador voy a nesecitar 2 POST uno para crear un nuevo grupo y el otro para asignar estudiantes y tambien nesecito un PUT 
-
 package com.cursos.servicio_cursos.controllers;
 
 import com.cursos.servicio_cursos.dtos.GroupDetails;
@@ -30,7 +28,7 @@ public class GroupController {
   }
 
   @GetMapping("course/{courseCode}")
-  public ResponseEntity<List<ResponseGroup>> findGoupsByCourseId(@PathVariable Long courseCode) {
+  public ResponseEntity<List<ResponseGroup>> findGroupsByCourseId(@PathVariable Long courseCode) {
     return ResponseEntity.ok(groupService.findGroupsByCourseCode(courseCode));
   }
 
@@ -49,8 +47,4 @@ public class GroupController {
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
 
-  @PutMapping("{groupId}/teacher/{teacherId}")
-  public ResponseEntity<ResponseGroup> assignTeacher(@PathVariable Long groupId, @PathVariable Long teacherId) {
-    return ResponseEntity.ok(groupService.assignTeacher(teacherId, groupId));
-  }
 }
