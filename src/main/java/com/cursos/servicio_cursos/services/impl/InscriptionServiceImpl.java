@@ -26,7 +26,8 @@ public class InscriptionServiceImpl implements InscriptionService {
   @Override
   @Transactional
   public void deleteByGroupId(Long groupId) {
-    var inscriptions = inscriptionRepo.findAllByGroupId(groupId);
+    var group = groupService.findById(groupId);
+    var inscriptions = inscriptionRepo.findAllByGroup(group);
     inscriptionRepo.deleteAll(inscriptions);
   }
 

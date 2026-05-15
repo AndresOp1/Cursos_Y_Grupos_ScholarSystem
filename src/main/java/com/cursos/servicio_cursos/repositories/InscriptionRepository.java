@@ -1,6 +1,7 @@
 package com.cursos.servicio_cursos.repositories;
 
 import com.cursos.servicio_cursos.entities.CourseEntity;
+import com.cursos.servicio_cursos.entities.GroupEntity;
 import com.cursos.servicio_cursos.entities.InscriptionEntity;
 import com.cursos.servicio_cursos.entities.InscriptionId;
 
@@ -18,5 +19,5 @@ public interface InscriptionRepository extends JpaRepository<InscriptionEntity, 
   @Query("SELECT DISTINCT i.group.course FROM InscriptionEntity i WHERE i.user.id = :userId")
   List<CourseEntity> findCoursesByUserId(@Param("userId") Long userId);
 
-  List<InscriptionEntity> findAllByGroupId(Long groupId);
+  List<InscriptionEntity> findAllByGroup(GroupEntity group);
 }
