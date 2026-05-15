@@ -46,5 +46,4 @@ public class GroupController {
     groupService.updateGroup(groupId, requestUpdate);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
-
 }

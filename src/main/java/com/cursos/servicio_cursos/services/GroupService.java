@@ -32,6 +32,7 @@ public class GroupService {
   private final ScheduleMapper scheduleMapper;
   private final UserMapper userMapper;
 
+  @Transactional
   public GroupEntity findById(Long id) {
     return groupRepository.findById(id)
             .orElseThrow(() -> new GroupNotFoundException(id));
