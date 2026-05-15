@@ -80,13 +80,19 @@ public class GroupService {
   public void updateGroup(Long groupId, UpdateGroupRequest req) {
     GroupEntity group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
     log.info("update request for course id {}, request {}", groupId, req);
+
+    GroupEntity updatedGroup = GroupEntity.builder()
+            .groupId(group.getGroupId())
+            .course(group.getCourse())
+            .build();
+
     UserEntity teacher = req.teacherId() == null ?
-            group.getTeacher() :
+            updatedGroup.getTeacher() :
             userRepository.findById(req.teacherId())
             .orElseThrow(UserNotFoundException::new);
 
-    String name = req.groupName() == null ?
-            group.getName() : req.groupName();
+    updatedGroup.setName(req.groupName() == null ?
+            updatedGroup.getName() : req.groupName());
 
     if (!teacher.getRole().getName().equals("PROFESOR"))
       throw new InvalidTeacherException();
@@ -94,6 +100,8 @@ public class GroupService {
     if (req.capacity() < 10) {
       throw new InvalidGroupCapacityException();
     }
+    updatedGroup.setCapacity(req.capacity());
+    groupRepository.save(updatedGroup);
 
     // update schedules
     scheduleRepo.deleteAllByGroupId(groupId);
@@ -105,14 +113,12 @@ public class GroupService {
     inscriptionRepo.deleteByGroupId(groupId);
     List<UserEntity> students = userRepository.findAllById(req.studentsIds());
     List<InscriptionEntity> inscriptions = students.stream().map(u -> {
-      var inscriptionId = new InscriptionId(u.getId(), group.getGroupId());
-      return InscriptionEntity.builder().user(u).group(group)
+      var inscriptionId = new InscriptionId(u.getId(), updatedGroup.getGroupId());
+      return InscriptionEntity.builder().user(u).group(updatedGroup)
               .inscriptionDate(LocalDateTime.now())
               .id(inscriptionId).build();
     }).toList();
     inscriptionRepo.saveAll(inscriptions);
-    groupRepository.updateGroup(groupId, name,
-            teacher, req.capacity());
   }
 
   private ResponseGroup extracted(GroupEntity savedGroup) {
