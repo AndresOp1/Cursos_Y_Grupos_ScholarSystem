@@ -1,10 +1,6 @@
 package com.cursos.servicio_cursos.dtos;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -14,10 +10,10 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class RequestGroup {
-    private String groupId;
-    private String name;
-    private Long courseId;
-    private Long teacherId;
-    private int capacity;
-    private List<ScheduleDto> schedules;
+  private Long groupId;
+  private String name;
+  private Long courseId;
+  private Long teacherId;
+  private int capacity;
+  private List<ScheduleDto> schedules;
 }

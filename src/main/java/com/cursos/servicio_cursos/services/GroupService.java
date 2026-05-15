@@ -1,18 +1,21 @@
 package com.cursos.servicio_cursos.services;
 
 import com.cursos.servicio_cursos.dtos.*;
-import com.cursos.servicio_cursos.entities.*;
+import com.cursos.servicio_cursos.entities.CourseEntity;
+import com.cursos.servicio_cursos.entities.GroupEntity;
+import com.cursos.servicio_cursos.entities.UserEntity;
 import com.cursos.servicio_cursos.exceptions.*;
 import com.cursos.servicio_cursos.mappers.GroupMapper;
 import com.cursos.servicio_cursos.mappers.ScheduleMapper;
 import com.cursos.servicio_cursos.mappers.UserMapper;
-import com.cursos.servicio_cursos.repositories.*;
+import com.cursos.servicio_cursos.repositories.CourseRepository;
+import com.cursos.servicio_cursos.repositories.GroupRepository;
+import com.cursos.servicio_cursos.repositories.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,13 +24,18 @@ import java.util.List;
 public class GroupService {
 
   private final GroupMapper groupMapper;
-  private final ScheduleRepository scheduleRepo;
+  private final ScheduleService scheduleService;
   private final GroupRepository groupRepository;
   private final UserRepository userRepository;
   private final CourseRepository courseRepo;
-  private final InscriptionRepository inscriptionRepo;
+  private final InscriptionService inscriptionService;
   private final ScheduleMapper scheduleMapper;
   private final UserMapper userMapper;
+
+  public GroupEntity findById(Long id) {
+    return groupRepository.findById(id)
+            .orElseThrow(() -> new GroupNotFoundException(id));
+  }
 
   // CREATE: Crear un nuevo grupo
   @Transactional
@@ -46,19 +54,10 @@ public class GroupService {
               .orElseThrow(UserNotFoundException::new);
     }
 
-    List<ScheduleEntity> schedules;
-    log.info("reqwuest schedules: {}", requestGroup.getSchedules());
-    try {
-      schedules = requestGroup.getSchedules().stream().map(scheduleMapper::toEntity)
-              .toList();
-    } catch (IllegalArgumentException e) {
-      throw new InvalidDayOfWeekException();
-    }
 
     GroupEntity group = GroupEntity.builder()
             .name(requestGroup.getName())
             .course(course)
-            .schedules(schedules)
             .capacity(requestGroup.getCapacity())
             .build();
     if (teacher != null) {
@@ -67,9 +66,8 @@ public class GroupService {
     log.info("apunto de guardar grupo {}", group);
     GroupEntity savedGroup = groupRepository.save(group);
 
-    schedules.forEach(s -> s.setGroup(savedGroup));
-    log.info("schedules entities: {}", schedules);
-    scheduleRepo.saveAll(schedules);
+    scheduleService.saveAll(requestGroup.getSchedules(),
+            requestGroup.getGroupId());
 
 
     return extracted(savedGroup);
@@ -85,7 +83,6 @@ public class GroupService {
             .groupId(group.getGroupId())
             .course(group.getCourse())
             .build();
-
     UserEntity teacher = req.teacherId() == null ?
             updatedGroup.getTeacher() :
             userRepository.findById(req.teacherId())
@@ -103,22 +100,11 @@ public class GroupService {
     updatedGroup.setCapacity(req.capacity());
     groupRepository.save(updatedGroup);
 
-    // update schedules
-    scheduleRepo.deleteAllByGroupId(groupId);
-    List<ScheduleEntity> schedules = req.schedules().stream()
-            .map(scheduleMapper::toEntity).toList();
-    scheduleRepo.saveAll(schedules);
+    scheduleService.deleteAllByGroupId(groupId);
+    inscriptionService.deleteByGroupId(groupId);
 
-    // update inscriptions
-    inscriptionRepo.deleteByGroupId(groupId);
-    List<UserEntity> students = userRepository.findAllById(req.studentsIds());
-    List<InscriptionEntity> inscriptions = students.stream().map(u -> {
-      var inscriptionId = new InscriptionId(u.getId(), updatedGroup.getGroupId());
-      return InscriptionEntity.builder().user(u).group(updatedGroup)
-              .inscriptionDate(LocalDateTime.now())
-              .id(inscriptionId).build();
-    }).toList();
-    inscriptionRepo.saveAll(inscriptions);
+    scheduleService.saveAll(req.schedules(), groupId);
+    inscriptionService.saveAllByGroup(req.studentsIds(), groupId);
   }
 
   private ResponseGroup extracted(GroupEntity savedGroup) {

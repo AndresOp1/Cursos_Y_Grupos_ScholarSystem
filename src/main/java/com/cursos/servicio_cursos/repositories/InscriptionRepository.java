@@ -27,4 +27,6 @@ public interface InscriptionRepository extends JpaRepository<InscriptionEntity, 
           WHERE i.group.groupId = :groupId
           """)
   void deleteByGroupId(@Param("groupId") Long groupId);
+
+  List<InscriptionEntity> findAllByGroupId(Long groupId);
 }

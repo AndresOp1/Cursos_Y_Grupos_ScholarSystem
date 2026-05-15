@@ -1,10 +1,5 @@
 package com.cursos.servicio_cursos.services.impl;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.stereotype.Service;
-
 import com.cursos.servicio_cursos.dtos.UserMessage;
 import com.cursos.servicio_cursos.dtos.UserResponse;
 import com.cursos.servicio_cursos.entities.RoleEntity;
@@ -14,10 +9,13 @@ import com.cursos.servicio_cursos.mappers.UserMapper;
 import com.cursos.servicio_cursos.repositories.RoleRepository;
 import com.cursos.servicio_cursos.repositories.UserRepository;
 import com.cursos.servicio_cursos.services.UserService;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +30,7 @@ public class UserServiceImpl implements UserService {
   public void upsertUser(UserMessage userMessage) {
     log.info("procesando usuario de id: {}", userMessage.id());
     RoleEntity role = roleRepo.findByName(userMessage.role())
-        .orElseThrow(() -> new InvalidRoleException(userMessage.role()));
+            .orElseThrow(() -> new InvalidRoleException(userMessage.role()));
 
     Optional<UserEntity> userEntity = userRepo.findById(userMessage.id());
     if (userEntity.isPresent()) {
@@ -41,11 +39,11 @@ public class UserServiceImpl implements UserService {
       return;
     }
     UserEntity user = UserEntity.builder()
-        .id(userMessage.id())
-        .email(userMessage.email())
-        .fullName(userMessage.fullName())
-        .role(role)
-        .build();
+            .id(userMessage.id())
+            .email(userMessage.email())
+            .fullName(userMessage.fullName())
+            .role(role)
+            .build();
     userRepo.save(user);
 
   }
@@ -54,4 +52,11 @@ public class UserServiceImpl implements UserService {
   public List<UserResponse> fetchTeachers() {
     return userRepo.findTeachers().stream().map(userMapper::fromEntityToResponse).toList();
   }
+
+  @Override
+  public List<UserEntity> findAllByIds(List<Long> ids) {
+    return userRepo.findAllById(ids);
+  }
+
+
 }
