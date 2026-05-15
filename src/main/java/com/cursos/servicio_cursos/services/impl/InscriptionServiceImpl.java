@@ -2,9 +2,10 @@ package com.cursos.servicio_cursos.services.impl;
 
 import com.cursos.servicio_cursos.entities.InscriptionEntity;
 import com.cursos.servicio_cursos.entities.InscriptionId;
+import com.cursos.servicio_cursos.exceptions.GroupNotFoundException;
 import com.cursos.servicio_cursos.exceptions.InvalidInscriptionException;
+import com.cursos.servicio_cursos.repositories.GroupRepository;
 import com.cursos.servicio_cursos.repositories.InscriptionRepository;
-import com.cursos.servicio_cursos.services.GroupService;
 import com.cursos.servicio_cursos.services.InscriptionService;
 import com.cursos.servicio_cursos.services.UserService;
 import jakarta.transaction.Transactional;
@@ -20,13 +21,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InscriptionServiceImpl implements InscriptionService {
   private final UserService userService;
-  private final GroupService groupService;
   private final InscriptionRepository inscriptionRepo;
+  private final GroupRepository groupRepository;
 
   @Override
   @Transactional
   public void deleteByGroupId(Long groupId) {
-    var group = groupService.findById(groupId);
+    var group = groupRepository.findById(groupId)
+            .orElseThrow(() -> new GroupNotFoundException(groupId));
     var inscriptions = inscriptionRepo.findAllByGroup(group);
     inscriptionRepo.deleteAll(inscriptions);
   }
@@ -35,7 +37,8 @@ public class InscriptionServiceImpl implements InscriptionService {
   @Transactional
   public void saveAllByGroup(List<Long> studentsId, Long groupId) {
     var users = userService.findAllByIds(studentsId);
-    var group = groupService.findById(groupId);
+    var group = groupRepository.findById(groupId)
+            .orElseThrow(() -> new GroupNotFoundException(groupId));
 
     var timestamp = LocalDateTime.now();
     List<InscriptionEntity> inscriptions = users.stream().map(u -> {
