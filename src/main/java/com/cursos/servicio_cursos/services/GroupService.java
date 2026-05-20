@@ -67,8 +67,9 @@ public class GroupService {
     log.info("apunto de guardar grupo {}", group);
     GroupEntity savedGroup = groupRepository.save(group);
 
-    scheduleService.saveAll(requestGroup.getSchedules(),
-            requestGroup.getGroupId());
+    if (requestGroup.getSchedules() != null)
+      scheduleService.saveAll(requestGroup.getSchedules(),
+              savedGroup.getGroupId());
 
 
     return extracted(savedGroup);
@@ -84,21 +85,27 @@ public class GroupService {
             .groupId(group.getGroupId())
             .course(group.getCourse())
             .build();
+    
     UserEntity teacher = req.teacherId() == null ?
             updatedGroup.getTeacher() :
             userRepository.findById(req.teacherId())
             .orElseThrow(UserNotFoundException::new);
 
+    log.info("Se esta guardando el profesor {}", teacher);
+    if (teacher != null && !teacher.getRole().getName().equals("PROFESOR"))
+      throw new InvalidTeacherException();
+
+    updatedGroup.setTeacher(teacher);
     updatedGroup.setName(req.groupName() == null ?
             updatedGroup.getName() : req.groupName());
 
-    if (!teacher.getRole().getName().equals("PROFESOR"))
-      throw new InvalidTeacherException();
 
     if (req.capacity() < 10) {
       throw new InvalidGroupCapacityException();
     }
     updatedGroup.setCapacity(req.capacity());
+
+    log.info("guardando entidad grupo: {}", updatedGroup);
     groupRepository.save(updatedGroup);
 
     scheduleService.deleteAllByGroupId(groupId);
@@ -110,7 +117,7 @@ public class GroupService {
 
   private ResponseGroup extracted(GroupEntity savedGroup) {
     return ResponseGroup.builder()
-            .schedules(savedGroup.getSchedules().stream().map(scheduleMapper::toDto).toList())
+            .schedules(savedGroup.getSchedules() == null ? null : savedGroup.getSchedules().stream().map(scheduleMapper::toDto).toList())
             .groupName(savedGroup.getName())
             .teacher(savedGroup.getTeacher())
             .course(ResponseCourse.builder()
@@ -127,7 +134,7 @@ public class GroupService {
             .id(group.getGroupId())
             .groupName(group.getName())
             .capacity(group.getCapacity())
-            .teacher(userMapper.fromEntityToResponse(group.getTeacher()))
+            .teacher(group.getTeacher() == null ? null : userMapper.fromEntityToResponse(group.getTeacher()))
             .schedules(group.getSchedules().stream().map(scheduleMapper::toDto).toList())
             .course(ResponseCourse.builder()
                     .code(group.getCourse().getCode())
