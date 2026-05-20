@@ -6,15 +6,10 @@
 package com.cursos.servicio_cursos.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.Check;
 
 import java.util.List;
-
-import org.hibernate.annotations.Check;
 
 @Entity
 @Table(name = "groups", schema = "courses_groups")
@@ -23,38 +18,39 @@ import org.hibernate.annotations.Check;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Data
 public class GroupEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false, unique = true, name = "group_id")
-    private long groupId; // Codigo unico del grupo
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(nullable = false, unique = true, name = "group_id")
+  private long groupId; // Codigo unico del grupo
 
-    @Column(nullable = false)
-    private String name; // Nombre del grupo
+  @Column(nullable = false)
+  private String name; // Nombre del grupo
 
-    // la recion es que muchos grupos pertenecen a un curos entonces seria ManyToOne
-    @ManyToOne
-    @JoinColumn(name = "course_code")
-    private CourseEntity course; // El curso al que pertenece el grupo
+  // la recion es que muchos grupos pertenecen a un curos entonces seria ManyToOne
+  @ManyToOne
+  @JoinColumn(name = "course_code")
+  private CourseEntity course; // El curso al que pertenece el grupo
 
-    // la relacion es que muchos grupos pertenecen a un profesor entonces seria
-    // ManyToOne
-    @ManyToOne
-    @JoinColumn(name = "teacher_id")
-    private UserEntity teacher; // El profesor que tendra el grupo
+  // la relacion es que muchos grupos pertenecen a un profesor entonces seria
+  // ManyToOne
+  @ManyToOne
+  @JoinColumn(name = "teacher_id")
+  private UserEntity teacher; // El profesor que tendra el grupo
 
-    // la relacion es que un grupo tiene muchos horarios entonces seria OneToMany
-    @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
-    private List<ScheduleEntity> schedules; // Los horarios del grupo
+  // la relacion es que un grupo tiene muchos horarios entonces seria OneToMany
+  @OneToMany(mappedBy = "group", fetch = FetchType.EAGER)
+  private List<ScheduleEntity> schedules; // Los horarios del grupo
 
-    // la relacion es que un grupo tiene muchas inscripciones entonces seria
-    // OneToMany
-    @OneToMany(mappedBy = "group")
-    private List<InscriptionEntity> inscriptions; // Las inscripciones al grupo
+  // la relacion es que un grupo tiene muchas inscripciones entonces seria
+  // OneToMany
+  @OneToMany(mappedBy = "group")
+  private List<InscriptionEntity> inscriptions; // Las inscripciones al grupo
 
-    @Check(constraints = "capacity >= 10")
-    @Column(nullable = true, name = "capacity", columnDefinition = "INT DEFAULT 10")
-    private int capacity; // La capacidad del grupo
+  @Check(constraints = "capacity >= 10")
+  @Column(nullable = true, name = "capacity", columnDefinition = "INT DEFAULT 10")
+  private int capacity; // La capacidad del grupo
 
 }
