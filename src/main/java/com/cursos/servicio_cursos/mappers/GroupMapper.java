@@ -16,7 +16,7 @@ public class GroupMapper {
   private final CourseMapper courseMapper;
   private final UserMapper userMapper;
 
-  public ResponseGroup fromEntityToResopnse(GroupEntity entity) {
+  public ResponseGroup fromEntityToResponse(GroupEntity entity) {
     return ResponseGroup.builder()
         .id(entity.getGroupId())
         .groupName(entity.getName())
