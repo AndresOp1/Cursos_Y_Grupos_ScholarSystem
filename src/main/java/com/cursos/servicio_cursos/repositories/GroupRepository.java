@@ -5,6 +5,8 @@ import com.cursos.servicio_cursos.entities.UserEntity;
 
 import jakarta.transaction.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -27,7 +29,6 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Long> {
   int asingTeacher(@Param("teacher") UserEntity teacher,
                    @Param("groupId") Long groupId);
 
-
   @Modifying
   @Transactional
   @Query("""
@@ -41,6 +42,15 @@ public interface GroupRepository extends JpaRepository<GroupEntity, Long> {
           @Param("name") String name,
           @Param("teacher") UserEntity teacher,
           @Param("capacity") int capacity);
+
+  Page<GroupEntity> findByTeacher(UserEntity teacher, Pageable pageable);
+
+  @Query(value = """
+          SELECT g FROM GroupEntity g JOIN g.inscriptions i
+          WHERE i.user = :student
+          """)
+  Page<GroupEntity> findByStudent(@Param("student") UserEntity student,
+                                  Pageable pageable);
 }
 
 // no se si este repositorio sea necesario

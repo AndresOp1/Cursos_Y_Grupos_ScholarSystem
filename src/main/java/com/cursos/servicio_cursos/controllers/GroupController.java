@@ -1,9 +1,6 @@
 package com.cursos.servicio_cursos.controllers;
 
-import com.cursos.servicio_cursos.dtos.GroupDetails;
-import com.cursos.servicio_cursos.dtos.RequestGroup;
-import com.cursos.servicio_cursos.dtos.ResponseGroup;
-import com.cursos.servicio_cursos.dtos.UpdateGroupRequest;
+import com.cursos.servicio_cursos.dtos.*;
 import com.cursos.servicio_cursos.services.GroupService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -46,4 +43,14 @@ public class GroupController {
     groupService.updateGroup(groupId, requestUpdate);
     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
   }
+
+  @GetMapping("/user/{userId}")
+  public ResponseEntity<PageResponse<ResponseGroup>> getGroupsByUserId(
+          @PathVariable Long userId,
+          @RequestParam(defaultValue = "0") int page,
+          @RequestParam(defaultValue = "6") int size) {
+    return ResponseEntity.ok(
+            groupService.findGroupsByUser(userId, page, size));
+  }
+
 }

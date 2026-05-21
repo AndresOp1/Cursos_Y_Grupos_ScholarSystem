@@ -1,13 +1,11 @@
 package com.cursos.servicio_cursos.mappers;
 
-import java.util.List;
-
-import org.springframework.stereotype.Component;
-
 import com.cursos.servicio_cursos.dtos.ResponseGroup;
 import com.cursos.servicio_cursos.entities.GroupEntity;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -18,12 +16,12 @@ public class GroupMapper {
 
   public ResponseGroup fromEntityToResponse(GroupEntity entity) {
     return ResponseGroup.builder()
-        .id(entity.getGroupId())
-        .groupName(entity.getName())
-        .teacher(userMapper.fromEntityToResponse(entity.getTeacher()))
-        .schedules(entity.getSchedules() == null ? List.of()
-            : entity.getSchedules().stream().map(scheduleMapper::toDto).toList())
-        .course(courseMapper.fromEntityToCourseResponse(entity.getCourse()))
-        .build();
+            .id(entity.getGroupId())
+            .groupName(entity.getName())
+            .teacher(entity.getTeacher() == null ? null : userMapper.fromEntityToResponse(entity.getTeacher()))
+            .schedules(entity.getSchedules() == null ? List.of()
+                    : entity.getSchedules().stream().map(scheduleMapper::toDto).toList())
+            .course(courseMapper.fromEntityToCourseResponse(entity.getCourse()))
+            .build();
   }
 }
