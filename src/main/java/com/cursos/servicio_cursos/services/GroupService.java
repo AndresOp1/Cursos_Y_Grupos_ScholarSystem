@@ -17,10 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
+@RequiredArgsConstructor
 public class GroupService {
 
   private final GroupMapper groupMapper;
@@ -116,7 +117,7 @@ public class GroupService {
             : savedGroup.getSchedules().stream().map(scheduleMapper::toDto)
                 .toList())
         .groupName(savedGroup.getName())
-        .teacher(savedGroup.getTeacher())
+        .teacher(userMapper.fromEntityToResponse(savedGroup.getTeacher()))
         .course(ResponseCourse.builder()
             .code(savedGroup.getCourse().getCode())
             .name(savedGroup.getCourse().getName())
@@ -147,6 +148,11 @@ public class GroupService {
     return groupRepository.findGroupsByCourseCode(courseCode).stream()
         .map(groupMapper::fromEntityToResopnse)
         .toList();
+  }
+
+  public PageResponse<ResponseGroup> findGroupsByUser(UUID user) {
+
+    return null;
   }
 
 }

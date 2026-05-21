@@ -14,12 +14,13 @@ import lombok.RequiredArgsConstructor;
 public class GroupMapper {
   private final ScheduleMapper scheduleMapper;
   private final CourseMapper courseMapper;
+  private final UserMapper userMapper;
 
   public ResponseGroup fromEntityToResopnse(GroupEntity entity) {
     return ResponseGroup.builder()
         .id(entity.getGroupId())
         .groupName(entity.getName())
-        .teacher(entity.getTeacher())
+        .teacher(userMapper.fromEntityToResponse(entity.getTeacher()))
         .schedules(entity.getSchedules() == null ? List.of()
             : entity.getSchedules().stream().map(scheduleMapper::toDto).toList())
         .course(courseMapper.fromEntityToCourseResponse(entity.getCourse()))
