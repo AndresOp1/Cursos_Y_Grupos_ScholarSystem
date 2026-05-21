@@ -35,7 +35,7 @@ public class GroupService {
   @Transactional
   public GroupEntity findById(Long id) {
     return groupRepository.findById(id)
-            .orElseThrow(() -> new GroupNotFoundException(id));
+        .orElseThrow(() -> new GroupNotFoundException(id));
   }
 
   // CREATE: Crear un nuevo grupo
@@ -47,20 +47,19 @@ public class GroupService {
     }
 
     CourseEntity course = courseRepo.findByCode(requestGroup.getCourseId())
-            .orElseThrow(CourseNotFoundException::new);
+        .orElseThrow(CourseNotFoundException::new);
 
     UserEntity teacher = null;
     if (requestGroup.getTeacherId() != null) {
       teacher = userRepository.findById(requestGroup.getTeacherId())
-              .orElseThrow(UserNotFoundException::new);
+          .orElseThrow(UserNotFoundException::new);
     }
 
-
     GroupEntity group = GroupEntity.builder()
-            .name(requestGroup.getName())
-            .course(course)
-            .capacity(requestGroup.getCapacity())
-            .build();
+        .name(requestGroup.getName())
+        .course(course)
+        .capacity(requestGroup.getCapacity())
+        .build();
     if (teacher != null) {
       group.setTeacher(teacher);
     }
@@ -69,8 +68,7 @@ public class GroupService {
 
     if (requestGroup.getSchedules() != null)
       scheduleService.saveAll(requestGroup.getSchedules(),
-              savedGroup.getGroupId());
-
+          savedGroup.getGroupId());
 
     return extracted(savedGroup);
 
@@ -82,13 +80,12 @@ public class GroupService {
     log.info("update request for course id {}, request {}", groupId, req);
 
     GroupEntity updatedGroup = GroupEntity.builder()
-            .groupId(group.getGroupId())
-            .course(group.getCourse())
-            .build();
-    
-    UserEntity teacher = req.teacherId() == null ?
-            updatedGroup.getTeacher() :
-            userRepository.findById(req.teacherId())
+        .groupId(group.getGroupId())
+        .course(group.getCourse())
+        .build();
+
+    UserEntity teacher = req.teacherId() == null ? updatedGroup.getTeacher()
+        : userRepository.findById(req.teacherId())
             .orElseThrow(UserNotFoundException::new);
 
     log.info("Se esta guardando el profesor {}", teacher);
@@ -96,9 +93,7 @@ public class GroupService {
       throw new InvalidTeacherException();
 
     updatedGroup.setTeacher(teacher);
-    updatedGroup.setName(req.groupName() == null ?
-            updatedGroup.getName() : req.groupName());
-
+    updatedGroup.setName(req.groupName() == null ? updatedGroup.getName() : req.groupName());
 
     if (req.capacity() < 10) {
       throw new InvalidGroupCapacityException();
@@ -117,36 +112,41 @@ public class GroupService {
 
   private ResponseGroup extracted(GroupEntity savedGroup) {
     return ResponseGroup.builder()
-            .schedules(savedGroup.getSchedules() == null ? null : savedGroup.getSchedules().stream().map(scheduleMapper::toDto).toList())
-            .groupName(savedGroup.getName())
-            .teacher(savedGroup.getTeacher())
-            .course(ResponseCourse.builder()
-                    .code(savedGroup.getCourse().getCode())
-                    .name(savedGroup.getCourse().getName())
-                    .credits(savedGroup.getCourse().getCredits()).build())
-            .build();
+        .schedules(savedGroup.getSchedules() == null ? null
+            : savedGroup.getSchedules().stream().map(scheduleMapper::toDto)
+                .toList())
+        .groupName(savedGroup.getName())
+        .teacher(savedGroup.getTeacher())
+        .course(ResponseCourse.builder()
+            .code(savedGroup.getCourse().getCode())
+            .name(savedGroup.getCourse().getName())
+            .credits(savedGroup.getCourse().getCredits()).build())
+        .build();
   }
-
 
   public GroupDetails getGroupDetails(Long groupId) {
     GroupEntity group = groupRepository.findById(groupId).orElseThrow(GroupNotFoundException::new);
     return GroupDetails.builder()
-            .id(group.getGroupId())
-            .groupName(group.getName())
-            .capacity(group.getCapacity())
-            .teacher(group.getTeacher() == null ? null : userMapper.fromEntityToResponse(group.getTeacher()))
-            .schedules(group.getSchedules().stream().map(scheduleMapper::toDto).toList())
-            .course(ResponseCourse.builder()
-                    .code(group.getCourse().getCode())
-                    .name(group.getCourse().getName())
-                    .credits(group.getCourse().getCredits()).build())
-            .students(group.getInscriptions().stream().map(i -> userMapper.fromEntityToResponse(i.getUser()))
-                    .toList())
-            .build();
+        .id(group.getGroupId())
+        .groupName(group.getName())
+        .capacity(group.getCapacity())
+        .teacher(group.getTeacher() == null ? null
+            : userMapper.fromEntityToResponse(group.getTeacher()))
+        .schedules(group.getSchedules().stream().map(scheduleMapper::toDto).toList())
+        .course(ResponseCourse.builder()
+            .code(group.getCourse().getCode())
+            .name(group.getCourse().getName())
+            .credits(group.getCourse().getCredits()).build())
+        .students(group.getInscriptions().stream()
+            .map(i -> userMapper.fromEntityToResponse(i.getUser()))
+            .toList())
+        .build();
   }
 
   public List<ResponseGroup> findGroupsByCourseCode(Long courseCode) {
-    return groupRepository.findGroupsByCourseCode(courseCode).stream().map(groupMapper::fromEntityToResopnse)
-            .toList();
+    return groupRepository.findGroupsByCourseCode(courseCode).stream()
+        .map(groupMapper::fromEntityToResopnse)
+        .toList();
   }
+
 }
